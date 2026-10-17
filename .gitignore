@@ -1,0 +1,20 @@
+# Segredos: o .env de verdade fica só na sua máquina e no servidor.
+.env
+.env.*
+!.env.example
+
+# Dependências e saídas de build: são recriadas, não versionadas.
+node_modules/
+dist/
+build/
+coverage/
+bin/
+
+# Logs e arquivos do sistema operacional
+*.log
+.DS_Store
+Thumbs.db
+
+# Configuração pessoal do editor (as recomendações do projeto podem entrar)
+.vscode/*
+!.vscode/extensions.json

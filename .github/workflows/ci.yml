@@ -1,0 +1,45 @@
+name: CI
+
+# Desligado de propósito: ainda não há código. O CI entra depois do obrigatório pronto
+# (etapa 9 do docs/ROADMAP.md); aí as três linhas do push saem do comentário e os comandos
+# de teste e de build entram em cada job.
+on:
+  # push:
+  #   branches: [staging]
+  workflow_dispatch:
+
+# O CI só lê o código: o token do GitHub não recebe permissão de escrita.
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          # A mesma versão dos Dockerfile.
+          node-version: 24
+          cache: npm
+          # O package-lock.json não fica na raiz: o cache precisa do caminho.
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build

@@ -1,0 +1,34 @@
+name: Deploy
+
+# Desligado de propósito: o projeto ainda não roda no servidor. Liga depois da entrega
+# (etapa 9 do docs/ROADMAP.md), com a pasta clonada na VPS, os dois serviços no compose do
+# infra e os três secrets cadastrados no repositório (VPS_HOST, VPS_USER e VPS_SSH_KEY).
+# Aí as três linhas do push saem do comentário.
+on:
+  # push:
+  #   branches: [main]
+  workflow_dispatch:
+
+# O deploy entra no servidor por SSH e não usa o token do GitHub.
+permissions: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy na VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          # Duas imagens, uma por pasta, e um serviço de cada no compose do infra.
+          script: |
+            set -e
+            cd ~/helpdesk-corporativo
+            git pull origin main
+            docker build -t helpdesk-corporativo-backend ./backend
+            docker build -t helpdesk-corporativo-frontend ./frontend
+            cd ~/infra
+            docker compose up -d --force-recreate helpdesk-corporativo-backend helpdesk-corporativo-frontend
+            docker image prune -f
