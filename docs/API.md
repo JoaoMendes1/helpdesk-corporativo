@@ -8,12 +8,19 @@ e do dashboard entram aqui nas etapas 3 a 5 do [`ROADMAP.md`](ROADMAP.md).
 
 ## Autenticação
 
-- Todas as rotas exigem login, menos a de login. Sem token, ou com token inválido, a
-  resposta é `401`.
+- Todas as rotas exigem login, menos a de login e a de saúde. Sem token, ou com token
+  inválido, a resposta é `401`.
 - O id e o perfil do usuário vêm do token, nunca do corpo da requisição.
 - Usuário inativo não entra: o login responde `401`, com a mesma mensagem de senha errada.
 - Como o token chega à API (cabeçalho ou cookie) depende da decisão pendente no
   [`DECISOES.md`](../DECISOES.md).
+
+  ## Rota de saúde
+
+### `GET /api/health`
+
+Responde `200` com `{ "status": "ok" }` quando a API está no ar. É a rota que o `healthcheck`
+do compose usa, e não exige login.
 
 ## Rotas obrigatórias
 

@@ -3,8 +3,9 @@
 Como o sistema funciona por dentro. O motivo de cada escolha está no
 [`DECISOES.md`](../DECISOES.md).
 
-**Estado:** 🕐 planejado. O código ainda não existe; cada seção passa a descrever o que existe
-à medida que as etapas do [`ROADMAP.md`](ROADMAP.md) ficam prontas.
+**Estado:** 🚧 em construção. Já existem os três containers, o banco com as migrations e o
+seed, e a API mínima (só a rota de saúde). As outras seções passam a descrever o que existe à
+medida que as etapas do [`ROADMAP.md`](ROADMAP.md) ficam prontas.
 
 ## Visão geral
 
@@ -20,6 +21,14 @@ navegador ──> frontend (Caddy) ──/api──> backend (Express) ──> m
 | `frontend` | O Caddy serve o build do React e repassa para o backend tudo o que começa com `/api`. É o único ponto de entrada |
 | `backend` | API em Express 5 com Prisma 6. No boot: aplica as migrations, roda o seed se o banco estiver vazio e sobe o servidor |
 | `mysql` | Banco de dados. Só o backend fala com ele |
+
+**Ordem de subida.** Cada container só sobe quando o anterior passa no seu teste de saúde
+(`healthcheck`), por causa do `depends_on` com `condition: service_healthy`:
+
+1. `mysql` fica saudável quando responde pela rede.
+2. `backend` aplica as migrations, roda o seed e sobe a API; fica saudável quando
+   `/api/health` responde.
+3. `frontend` sobe e passa a atender na porta publicada.
 
 ## Backend
 

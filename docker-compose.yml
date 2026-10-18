@@ -1,0 +1,44 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-helpdesk}
+      MYSQL_USER: ${MYSQL_USER:-helpdesk}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-helpdesk_dev}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev}
+    volumes:
+      - mysql-dados:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  backend:
+    build: ./backend
+    init: true
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:-helpdesk}:${MYSQL_PASSWORD:-helpdesk_dev}@mysql:3306/${MYSQL_DATABASE:-helpdesk}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: backend:3000
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  mysql-dados:

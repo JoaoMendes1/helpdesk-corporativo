@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Perfil {
+  SOLICITANTE
+  APROVADOR
+}
+
+enum StatusSolicitacao {
+  PENDENTE
+  APROVADA
+  RECUSADA
+  CANCELADA
+}
+
+enum StatusEquipamento {
+  DISPONIVEL
+  EMPRESTADO
+  MANUTENCAO
+  INATIVO
+}
+
+model Usuario {
+  id                  Int                    @id @default(autoincrement())
+  nome                String
+  email               String                 @unique
+  senha               String
+  perfil              Perfil                 @default(SOLICITANTE)
+  ativo               Boolean                @default(true)
+  dtCadastro          DateTime               @default(now())
+  solicitacoes        Solicitacao[]          @relation("Solicitante")
+  decisoes            Solicitacao[]          @relation("Aprovador")
+  historicos          HistoricoSolicitacao[]
+  equipamentosCriados Equipamento[]
+
+  @@map("usuarios")
+}
+
+model Equipamento {
+  id           Int               @id @default(autoincrement())
+  marca        String
+  modelo       String
+  tipo         String
+  status       StatusEquipamento @default(DISPONIVEL)
+  dtCadastro   DateTime          @default(now())
+  criadoPorId  Int
+  criadoPor    Usuario           @relation(fields: [criadoPorId], references: [id])
+  solicitacoes Solicitacao[]
+
+  // Fora do modelo oficial: atendem aos filtros da listagem e à contagem do dashboard
+  @@index([status, tipo])
+  @@index([tipo])
+  @@map("equipamentos")
+}
+
+model Solicitacao {
+  id               Int                    @id @default(autoincrement())
+  solicitanteId    Int
+  equipamentoId    Int?
+  descricao        String
+  marcaSolicitada  String?
+  modeloSolicitado String?
+  tipoSolicitado   String?
+  status           StatusSolicitacao      @default(PENDENTE)
+  observacao       String?                @db.Text
+  dtSolicitacao    DateTime               @default(now())
+  dtDecisao        DateTime?
+  aprovadorId      Int?
+  solicitante      Usuario                @relation("Solicitante", fields: [solicitanteId], references: [id])
+  aprovador        Usuario?               @relation("Aprovador", fields: [aprovadorId], references: [id])
+  equipamento      Equipamento?           @relation(fields: [equipamentoId], references: [id])
+  historicos       HistoricoSolicitacao[]
+
+  @@index([solicitanteId, status])
+  @@index([aprovadorId, status])
+  // Fora do modelo oficial: a lista de pendentes filtra por status e ordena pela data.
+  @@index([status, dtSolicitacao])
+  @@map("solicitacoes")
+}
+
+model HistoricoSolicitacao {
+  id             Int                @id @default(autoincrement())
+  solicitacaoId  Int
+  usuarioId      Int
+  statusAnterior StatusSolicitacao?
+  statusNovo     StatusSolicitacao
+  observacao     String?            @db.Text
+  dtRegistro     DateTime           @default(now())
+  solicitacao    Solicitacao        @relation(fields: [solicitacaoId], references: [id], onDelete: Cascade)
+  usuario        Usuario            @relation(fields: [usuarioId], references: [id])
+
+  @@index([solicitacaoId, dtRegistro])
+  @@map("historico_solicitacoes")
+}

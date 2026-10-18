@@ -101,6 +101,18 @@ Registradas em 17/10/2026.
 
 ## Banco
 
+### Prisma 6, e não o 7
+
+- **Por quê:** o modelo de dados da especificação está no formato do 6 (gerador
+  `prisma-client-js` e `url` no `datasource`), e o 7 exigiria alterá-lo (arquivo de
+  configuração, adaptador de banco e ESM). O 6 também é a versão que a equipe responsável
+  pelo teste usa: antes de começar, consultei a equipe para desenvolver na mesma linha de
+  versões. Essa escolha é deste projeto, não da especificação, e vale enquanto a versão tiver
+  suporte; o Vite é o caso oposto, atualizado porque a versão da equipe já não tem.
+- **Custo:** a linha 6 recebe só correções de segurança, até 19/11/2026.
+- **Reavaliar:** se o projeto continuar depois dessa data. A migração para o 7 não muda as
+  regras de negócio, só a configuração do Prisma.
+
 ### Índices que o modelo oficial não tem
 
 - **Como:** em `equipamentos`, para os filtros por `status` e `tipo`; em `solicitacoes`,

@@ -11,15 +11,15 @@ equipamentos e decide cada pedido, com justificativa.
 
 | Requisito | Status | Onde |
 |---|---|---|
-| Backend em Node.js com Prisma, controllers separados das regras de negócio | 🕐 Planejado | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
-| Frontend em React com Vite, com estados de carregamento, erro e validação | 🕐 Planejado | [`docs/PAGES.md`](docs/PAGES.md) |
-| MySQL com índices de acordo com os filtros usados | 🕐 Planejado | [`DECISOES.md`](DECISOES.md) |
-| Projeto inteiro sobe com `docker compose up` | 🕐 Planejado | [Como rodar](#como-rodar) |
+| Backend em Node.js com Prisma, controllers separados das regras de negócio | 🚧 Em andamento | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
+| Frontend em React com Vite, com estados de carregamento, erro e validação | 🚧 Em andamento | [`docs/PAGES.md`](docs/PAGES.md) |
+| MySQL com índices de acordo com os filtros usados | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
+| Projeto inteiro sobe com `docker compose up` | ✅ Pronto | [Como rodar](#como-rodar) |
 | Perfis de solicitante e de aprovador, com a regra crítica | 🕐 Planejado | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
 | `POST /api/novo-equipamento`, `GET /api/equipamentos` e `GET /api/equipamento/:id` | 🕐 Planejado | [`docs/API.md`](docs/API.md) |
 | Erros padronizados (`400`, `404`, `409`, `422`) | 🕐 Planejado | [`docs/API.md`](docs/API.md) |
-| Variáveis de ambiente e `.env.example` sem senhas | 🚧 Em andamento | [`.env.example`](.env.example) |
-| Migrations e seed no primeiro boot, com histórico | 🕐 Planejado | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
+| Variáveis de ambiente e `.env.example` sem senhas | ✅ Pronto | [`.env.example`](.env.example) |
+| Migrations e seed no primeiro boot, com histórico | ✅ Pronto | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
 | Dashboard com os totais de equipamentos por status | 🕐 Planejado | [`docs/PAGES.md`](docs/PAGES.md) |
 | `README.md` com o passo a passo e o uso de IA | 🚧 Em andamento | Este arquivo |
 | `DECISOES.md` com as decisões e os padrões de projeto | 🚧 Em andamento | [`DECISOES.md`](DECISOES.md) |
@@ -27,41 +27,51 @@ equipamentos e decide cada pedido, com justificativa.
 
 ## Como rodar
 
-O endereço de acesso, os usuários de teste e o nome da variável de porta entram aqui junto
-com o `docker-compose.yml`, na etapa 2.
+**Estado atual:** o `docker compose up` sobe o banco já com os dados de teste, a API (por
+enquanto, só a rota de saúde) e a página padrão do Vite. O login e as telas entram nas
+próximas etapas.
 
 **Pré-requisitos:** Git e Docker com o Compose (no Windows e no macOS, o Docker Desktop).
 
-1. Clone o repositório e entre na pasta:
+**1. Clone o repositório e entre na pasta:**
 
 ```bash
-   git clone https://github.com/JoaoMendes1/helpdesk-corporativo.git
-   cd helpdesk-corporativo
+git clone https://github.com/JoaoMendes1/helpdesk-corporativo.git
+cd helpdesk-corporativo
 ```
 
-2. Suba o projeto. Não é preciso criar `.env`:
+**2. Suba o projeto.** Não é preciso criar `.env`:
 
 ```bash
-   docker compose up
+docker compose up
 ```
 
-   No primeiro boot, o backend aplica as migrations e popula o banco com dados fictícios.
+Na primeira vez, o Docker baixa as imagens e instala as dependências, o que pode levar alguns
+minutos. Depois, o backend aplica as migrations e popula o banco com dados fictícios. Está
+pronto quando o log mostrar `API ouvindo na porta 3000`.
 
-3. Abra o endereço no navegador e entre com um dos usuários de teste: há um de cada perfil e
-   um inativo, para testar o bloqueio do login.
+**3. Abra `http://localhost:8080` no navegador.** Usuários de teste, todos com a senha
+`Senha@123`:
 
-4. Para testar a API direto, faça login e use o token nas outras rotas. As rotas e os
-   formatos estão no [`docs/API.md`](docs/API.md).
+| E-mail | Perfil | Para testar |
+|---|---|---|
+| `aprovador@example.com` | Aprovador | Cadastro de equipamento e decisão sobre solicitações |
+| `solicitante@example.com` | Solicitante | Criação e acompanhamento das próprias solicitações |
+| `cristina@example.com` | Solicitante | Que um solicitante não vê as solicitações do outro |
+| `inativo@example.com` | Solicitante, inativo | O bloqueio do login de usuário inativo |
 
-5. Para parar:
+**4. Para testar a API direto,** faça login e use o token nas outras rotas. As rotas e os
+formatos estão no [`docs/API.md`](docs/API.md).
+
+**5. Para parar:**
 
 ```bash
-   docker compose down      # para os containers e mantém o banco
-   docker compose down -v   # para e apaga o banco; o próximo up roda o seed de novo
+docker compose down      # para os containers e mantém o banco
+docker compose down -v   # para e apaga o banco; o próximo up roda o seed de novo
 ```
 
-**Porta ocupada:** se a porta do frontend já estiver em uso na sua máquina, copie o
-`.env.example` para `.env` e troque a porta lá.
+**Porta ocupada:** se a porta 8080 já estiver em uso na sua máquina, copie o `.env.example`
+para `.env` e preencha `FRONTEND_PORT` com outra porta.
 
 ## Uso de IA
 
@@ -72,6 +82,7 @@ entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS
 | Onde | Como a IA foi usada | O que foi meu |
 |---|---|---|
 | Planejamento e documentação | Revisou a especificação, apontou lacunas e alternativas, e redigiu os documentos a partir das decisões | As decisões, os alinhamentos com a equipe e a revisão dos textos |
+| Banco e infraestrutura | Propôs o schema com os índices, o seed, os Dockerfiles e o compose, e explicou cada escolha | A implementação, a correção dos erros que apareceram no boot e a conferência com o sistema rodando |
 
 Cada etapa acrescenta a sua linha nesta tabela.
 

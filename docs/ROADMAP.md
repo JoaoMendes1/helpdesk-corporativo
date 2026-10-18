@@ -6,9 +6,9 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 
 | Etapa | Status |
 |---|---|
-| 1 · Repositório e documentação | 🚧 Em andamento |
-| 2 · Banco e infraestrutura | 🕐 Planejada |
-| 3 · Base da API e login | 🕐 Planejada |
+| 1 · Repositório e documentação | ✅ Concluída |
+| 2 · Banco e infraestrutura | ✅ Concluída |
+| 3 · Base da API e login | 🚧 Próxima |
 | 4 · Equipamentos e dashboard | 🕐 Planejada |
 | 5 · Solicitações | 🕐 Planejada |
 | 6 · Frontend: login, equipamentos e dashboard | 🕐 Planejada |
@@ -16,7 +16,7 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 8 · Entrega | 🕐 Planejada |
 | 9 · Depois da entrega (`optional`) | 🕐 Planejada |
 
-Legenda: ✅ Concluída · 🚧 Em andamento · 🕐 Planejada.
+Legenda: ✅ Concluída · 🚧 Em andamento ou próxima · 🕐 Planejada.
 
 ## O obrigatório
 
@@ -31,24 +31,24 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] Labels do catálogo e a label `optional`
 - [x] Quadro ligado ao repositório, com as automações
 - [x] Documentação adaptada ao teste: `README.md`, `AGENTS.md`, `DECISOES.md` e `docs/`
-- [ ] Primeiro commit na `main` e branch `staging`
+- [x] Primeiro commit na `main` e branch `staging`
 
-## Etapa 2: Banco e infraestrutura
+## Etapa 2: Banco e infraestrutura (#1)
 
-- [ ] `docker-compose.yml` com MySQL, backend e frontend, funcionando sem `.env`, com valores
+- [x] `docker-compose.yml` com MySQL, backend e frontend, funcionando sem `.env`, com valores
       de desenvolvimento fictícios
-- [ ] MySQL com `healthcheck`, e o backend esperando por ele (`depends_on` com
+- [x] MySQL com `healthcheck`, e o backend esperando por ele (`depends_on` com
       `condition: service_healthy`)
-- [ ] Schema do Prisma a partir do modelo da especificação, com os índices que o modelo
+- [x] Schema do Prisma a partir do modelo da especificação, com os índices que o modelo
       oficial não tem (em `equipamentos` e para a lista de pendentes)
-- [ ] Primeira migration, aplicada no boot com `prisma migrate deploy`
-- [ ] Seed com dados fictícios: usuários dos dois perfis e um inativo, equipamentos variados
+- [x] Primeira migration, aplicada no boot com `prisma migrate deploy`
+- [x] Seed com dados fictícios: usuários dos dois perfis e um inativo, equipamentos variados
       e solicitações com histórico. Só roda com o banco vazio
-- [ ] Endereço do backend no Caddyfile por variável, para a mesma imagem do frontend rodar
+- [x] Endereço do backend no Caddyfile por variável, para a mesma imagem do frontend rodar
       local e no servidor
-- [ ] Só a porta do frontend publicada na máquina, configurável pelo `.env`
-- [ ] `docker compose up` do zero funcionando
-- [ ] `README.md`: endereço de acesso e usuários de teste
+- [x] Só a porta do frontend publicada na máquina, configurável pelo `.env`
+- [x] `docker compose up` do zero funcionando
+- [x] `README.md`: endereço de acesso e usuários de teste
 
 ## Etapa 3: Base da API e login
 

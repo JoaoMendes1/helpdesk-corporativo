@@ -56,6 +56,12 @@ Valem só aqui. Cada uma tem o motivo, para não ser quebrada sem saber o custo.
 - **Prisma 6, não o 7.** O modelo de dados da especificação está no formato do 6
   (`prisma-client-js`, `url = env("DATABASE_URL")`). O 7 exige `prisma.config.ts`, adaptador
   de banco e ESM, e obrigaria a reescrever o modelo entregue.
+- **É uma exceção consciente à regra 6:** a linha 6 recebe só correções de segurança, até
+    19/11/2026. O motivo e o custo estão no `DECISOES.md`.
+- **Não aceite as sugestões de atualizar para o 7 ou o 8:** nem a caixa "Update available"
+    da CLI, nem o `npm audit fix --force` (a falha que o `npm audit` aponta é da CLI do
+    Prisma, não do código da aplicação), nem o Quick Fix da extensão do VS Code, que deve
+    ficar fixada no 6 com o comando "Prisma: Pin to Prisma 6".
 - **As bibliotecas seguem as linhas que a equipe responsável pelo teste usa** (Express 5,
   Prisma 6, React 19), sempre na versão mais recente de cada linha. A verificação de
   dependências (regra 6) vale dentro dessas linhas.
@@ -151,11 +157,11 @@ O catálogo de labels é mantido no repositório `modelo-projeto`, com nome em i
 descrição em português. Este repositório recebe o catálogo com o comando `gh label clone`, e
 as labels padrão do GitHub que não fazem parte dele são apagadas.
 
-| Grupo | Labels |
-|---|---|
-| Tipo | `feature`, `enhancement`, `bug`, `security`, `refactor`, `documentation`, `chore`, `decision` |
-| Área | `backend`, `frontend`, `database`, `auth`, `infra`, `integration`, `ai`, `mobile`, `ui/ux` |
-| Só deste projeto | `optional` |
+| Grupo            | Labels                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| Tipo             | `feature`, `enhancement`, `bug`, `security`, `refactor`, `documentation`, `chore`, `decision` |
+| Área             | `backend`, `frontend`, `database`, `auth`, `infra`, `integration`, `ai`, `mobile`, `ui/ux`    |
+| Só deste projeto | `optional`                                                                                    |
 
 - **Toda issue recebe um tipo e uma ou mais áreas.**
 - **Os modelos de issue aplicam `feature` e `bug` pelo nome exato.** Renomear uma dessas
@@ -239,15 +245,15 @@ git checkout staging
 
 9. **Um fato, um lugar.** Nada é copiado de um documento para outro; um aponta para o outro.
 
-   | Arquivo | O que fica nele |
-   |---|---|
-   | `docs/ROADMAP.md` | Escopo: as etapas do teste, o que é obrigatório e o que é `optional`, dívidas, ideias. A cada entrega, no mesmo push: itens marcados com `[x]` e a issue, e a tabela de status atualizada |
-   | `DECISOES.md` | Decisões estruturais (arquitetura, banco, auth, framework), com o motivo e o custo aceito. Não é log de commit |
-   | `docs/PITFALLS.md` | Armadilhas que já aconteceram. Corrigida é marcada, nunca apagada |
-   | `docs/ARQUITETURA.md` | Como o sistema funciona hoje. Mudou o funcionamento, muda o arquivo no mesmo commit |
-   | `docs/PAGES.md` | Estado de cada tela |
-   | `docs/API.md` | O contrato da API com quem a consome: o frontend e quem avalia. Mudança no contrato muda o arquivo no mesmo commit |
-   | `backend/prisma/migrations/` | Schema versionado. Migration aplicada nunca é editada |
+   | Arquivo                      | O que fica nele                                                                                                                                                                           |
+   | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `docs/ROADMAP.md`            | Escopo: as etapas do teste, o que é obrigatório e o que é `optional`, dívidas, ideias. A cada entrega, no mesmo push: itens marcados com `[x]` e a issue, e a tabela de status atualizada |
+   | `DECISOES.md`                | Decisões estruturais (arquitetura, banco, auth, framework), com o motivo e o custo aceito. Não é log de commit                                                                            |
+   | `docs/PITFALLS.md`           | Armadilhas que já aconteceram. Corrigida é marcada, nunca apagada                                                                                                                         |
+   | `docs/ARQUITETURA.md`        | Como o sistema funciona hoje. Mudou o funcionamento, muda o arquivo no mesmo commit                                                                                                       |
+   | `docs/PAGES.md`              | Estado de cada tela                                                                                                                                                                       |
+   | `docs/API.md`                | O contrato da API com quem a consome: o frontend e quem avalia. Mudança no contrato muda o arquivo no mesmo commit                                                                        |
+   | `backend/prisma/migrations/` | Schema versionado. Migration aplicada nunca é editada                                                                                                                                     |
 
 10. **Fase nova não vai para o fim da fila.** Se uma fase revela dívida ou requisito novo, a
     correção vira fase intermediária (ex.: 3.5), entre as duas que a originaram.
