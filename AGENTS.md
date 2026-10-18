@@ -56,9 +56,9 @@ Valem só aqui. Cada uma tem o motivo, para não ser quebrada sem saber o custo.
 - **Prisma 6, não o 7.** O modelo de dados da especificação está no formato do 6
   (`prisma-client-js`, `url = env("DATABASE_URL")`). O 7 exige `prisma.config.ts`, adaptador
   de banco e ESM, e obrigaria a reescrever o modelo entregue.
-- **É uma exceção consciente à regra 6:** a linha 6 recebe só correções de segurança, até
+  - **É uma exceção consciente à regra 6:** a linha 6 recebe só correções de segurança, até
     19/11/2026. O motivo e o custo estão no `DECISOES.md`.
-- **Não aceite as sugestões de atualizar para o 7 ou o 8:** nem a caixa "Update available"
+  - **Não aceite as sugestões de atualizar para o 7 ou o 8:** nem a caixa "Update available"
     da CLI, nem o `npm audit fix --force` (a falha que o `npm audit` aponta é da CLI do
     Prisma, não do código da aplicação), nem o Quick Fix da extensão do VS Code, que deve
     ficar fixada no 6 com o comando "Prisma: Pin to Prisma 6".
@@ -283,9 +283,11 @@ git checkout staging
 
 15. **Diga onde o comando roda:** na máquina local ou no servidor, no terminal ou no editor.
 
-16. **Commit só depois de aprovado, e com conferência.** A proposta é aprovada antes de vir
-    o comando de commit. O comando vem num bloco que confere se os arquivos chegaram inteiros
-    e só faz o commit se tudo passar; se algo falhar, ele para com **❌ PARE** e diz o quê.
+16. **Commit só depois de aprovado, e com travas.** A proposta é aprovada antes de vir o
+    comando de commit. O bloco confere só o que não pode dar errado: a branch é a certa, e
+    nenhum `.env` nem `node_modules` entra no commit. Se uma trava falhar, ele para com
+    **❌ PARE** e diz qual. O conteúdo dos arquivos é conferido pela revisão do
+    `git diff --cached` (regra 8) e com o sistema rodando, não pelo bloco de commit.
 
 ## Este projeto no portfólio
 

@@ -56,7 +56,7 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [ ] Validação de entrada com `zod`
 - [ ] Login com JWT e senha com hash (`optional`, ver "O obrigatório"), recusando usuário
       inativo
-- [ ] Login exigido em toda a `/api`, menos na rota de login
+- [ ] Login exigido em toda a `/api`, menos nas rotas de login e de saúde (`/api/health`)
 - [ ] Middleware que exige um perfil (aprovador ou solicitante)
 
 ## Etapa 4: Equipamentos e dashboard
@@ -80,7 +80,8 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 
 ## Etapa 6: Frontend: login, equipamentos e dashboard
 
-- [ ] Decidir onde o token fica guardado (pendente no `DECISOES.md`)
+- [x] Decidir onde o token fica guardado: cookie `httpOnly`, decidido antes, porque a
+      etapa 3 já dependia da resposta
 - [ ] Tela de login
 - [ ] Lista de equipamentos com filtros, e cadastro só para o aprovador
 - [ ] Dashboard com os totais por status

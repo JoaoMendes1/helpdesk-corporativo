@@ -55,12 +55,13 @@ ouvir a porta. Separados, o app pode ser testado sem subir o servidor.
 
 - O usuário entra com e-mail e senha. A senha fica no banco só como hash (`bcryptjs`).
 - Usuário inativo (`ativo = false`) não entra.
-- No login, a API devolve um JWT com o id e o perfil do usuário.
-- O frontend envia o token em toda requisição. Se vai no cabeçalho ou em cookie, é a decisão
-  pendente no `DECISOES.md`.
+- No login, a API grava um JWT com o id e o perfil do usuário num cookie `httpOnly`. O
+  navegador o envia sozinho em toda requisição, e o JavaScript do frontend não consegue lê-lo.
+- Ao abrir, o frontend consulta `GET /api/me` para saber quem está logado. O logout também
+  passa pela API, que apaga o cookie.
 - O middleware valida o token e coloca o usuário na requisição. **O id e o perfil usados nas
   regras vêm sempre daí, nunca do corpo, da URL ou da query string.**
-- Todas as rotas da `/api` exigem login, menos a de login.
+- Todas as rotas da `/api` exigem login, menos a de login e a de saúde (`/api/health`).
 - As rotas de cadastro de equipamento e de decisão sobre solicitação exigem também o perfil
   `APROVADOR`. A de criar solicitação exige o perfil `SOLICITANTE`.
 

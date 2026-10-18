@@ -12,10 +12,12 @@ e do dashboard entram aqui nas etapas 3 a 5 do [`ROADMAP.md`](ROADMAP.md).
   inválido, a resposta é `401`.
 - O id e o perfil do usuário vêm do token, nunca do corpo da requisição.
 - Usuário inativo não entra: o login responde `401`, com a mesma mensagem de senha errada.
-- Como o token chega à API (cabeçalho ou cookie) depende da decisão pendente no
-  [`DECISOES.md`](../DECISOES.md).
+- O token vai num cookie `httpOnly`, que o navegador envia sozinho em toda requisição. O
+  motivo está no [`DECISOES.md`](../DECISOES.md).
 
-  ## Rota de saúde
+## Rota de saúde
+
+## Rota de saúde
 
 ### `GET /api/health`
 
