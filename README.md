@@ -15,21 +15,21 @@ equipamentos e decide cada pedido, com justificativa.
 | Frontend em React com Vite, com estados de carregamento, erro e validação | 🚧 Em andamento | [`docs/PAGES.md`](docs/PAGES.md) |
 | MySQL com índices de acordo com os filtros usados | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
 | Projeto inteiro sobe com `docker compose up` | ✅ Pronto | [Como rodar](#como-rodar) |
-| Perfis de solicitante e de aprovador, com a regra crítica | 🕐 Planejado | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
+| Perfis de solicitante e de aprovador, com a regra crítica | 🚧 Em andamento | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
 | `POST /api/novo-equipamento`, `GET /api/equipamentos` e `GET /api/equipamento/:id` | 🕐 Planejado | [`docs/API.md`](docs/API.md) |
-| Erros padronizados (`400`, `404`, `409`, `422`) | 🕐 Planejado | [`docs/API.md`](docs/API.md) |
+| Erros padronizados (`400`, `404`, `409`, `422`) | 🚧 Em andamento | [`docs/API.md`](docs/API.md) |
 | Variáveis de ambiente e `.env.example` sem senhas | ✅ Pronto | [`.env.example`](.env.example) |
 | Migrations e seed no primeiro boot, com histórico | ✅ Pronto | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
 | Dashboard com os totais de equipamentos por status | 🕐 Planejado | [`docs/PAGES.md`](docs/PAGES.md) |
 | `README.md` com o passo a passo e o uso de IA | 🚧 Em andamento | Este arquivo |
 | `DECISOES.md` com as decisões e os padrões de projeto | 🚧 Em andamento | [`DECISOES.md`](DECISOES.md) |
-| Diferencial: login com JWT | 🕐 Planejado | [`DECISOES.md`](DECISOES.md) |
+| Diferencial: login com JWT | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
 
 ## Como rodar
 
 **Estado atual:** o `docker compose up` sobe o banco já com os dados de teste, a API (por
-enquanto, só a rota de saúde) e a página padrão do Vite. O login e as telas entram nas
-próximas etapas.
+enquanto, o login e a rota de saúde) e a página padrão do Vite. As rotas de equipamentos e as
+telas entram nas próximas etapas.
 
 **Pré-requisitos:** Git e Docker com o Compose (no Windows e no macOS, o Docker Desktop).
 
@@ -60,8 +60,16 @@ pronto quando o log mostrar `API ouvindo na porta 3000`.
 | `cristina@example.com` | Solicitante | Que um solicitante não vê as solicitações do outro |
 | `inativo@example.com` | Solicitante, inativo | O bloqueio do login de usuário inativo |
 
-**4. Para testar a API direto,** faça login e use o token nas outras rotas. As rotas e os
-formatos estão no [`docs/API.md`](docs/API.md).
+**4. Para testar a API direto,** faça login guardando o cookie num arquivo (`-c`) e envie o
+mesmo arquivo nas outras rotas (`-b`). Toda rota, menos o login e a de saúde, exige o cookie:
+
+```bash
+curl -c /tmp/helpdesk-cookies.txt -X POST localhost:8080/api/login -H 'Content-Type: application/json' -d '{"email":"aprovador@example.com","senha":"Senha@123"}'
+curl -b /tmp/helpdesk-cookies.txt localhost:8080/api/me
+```
+
+No Windows, use o Git Bash, ou um cliente como Postman ou Insomnia, que guardam o cookie
+sozinhos. As rotas e os formatos estão no [`docs/API.md`](docs/API.md).
 
 **5. Para parar:**
 
@@ -83,6 +91,7 @@ entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS
 |---|---|---|
 | Planejamento e documentação | Revisou a especificação, apontou lacunas e alternativas, e redigiu os documentos a partir das decisões | As decisões, os alinhamentos com a equipe e a revisão dos textos |
 | Banco e infraestrutura | Propôs o schema com os índices, o seed, os Dockerfiles e o compose, e explicou cada escolha | A implementação, a correção dos erros que apareceram no boot e a conferência com o sistema rodando |
+| Base da API e login | Comparou as formas de guardar o token, propôs o formato de erro, a validação e o login, e montou os testes de cada caminho de erro | A escolha do cookie, a implementação, a revisão dos comentários e a conferência fora do Docker e com o sistema rodando |
 
 Cada etapa acrescenta a sua linha nesta tabela.
 
@@ -90,10 +99,10 @@ Cada etapa acrescenta a sua linha nesta tabela.
 
 | Camada | O que é |
 |---|---|
-| **Backend** | Node.js com Express 5, em JavaScript, e Prisma 6 como ORM |
+| **Backend** | Node.js com Express 5, em JavaScript, Prisma 6 como ORM e `zod` na validação de entrada |
 | **Banco** | MySQL, com as migrations e o seed do Prisma |
 | **Frontend** | React 19 com Vite, TypeScript, Tailwind e React Router 7 |
-| **Autenticação** | JWT, com a senha guardada como hash (`bcryptjs`) |
+| **Autenticação** | JWT em cookie `httpOnly`, com a senha guardada como hash (`bcryptjs`) |
 | **Servidor web** | Caddy: serve o frontend e repassa `/api` para o backend |
 | **Local** | Docker Compose: banco, API e frontend sobem com `docker compose up` |
 | **Hospedagem** | VPS própria, em container Docker atrás do Caddy (planejado) |
@@ -108,7 +117,7 @@ Cada etapa acrescenta a sua linha nesta tabela.
 | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) | Como o sistema funciona por dentro e onde ele roda |
 | [`docs/API.md`](docs/API.md) | As rotas da API: entrada, resposta e erros |
 | [`docs/PAGES.md`](docs/PAGES.md) | As telas e o estado de cada uma |
-| [`docs/PITFALLS.md`](docs/PITFALLS.md) | Armadilhas conhecidas, com sintoma e conferência |
+| [`docs/PITFALLS.md`](docs/PITFALLS.md) | Falhas silenciosas que já aconteceram, com sintoma e conferência |
 
 ---
 

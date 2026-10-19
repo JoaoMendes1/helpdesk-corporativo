@@ -77,6 +77,10 @@ Valem só aqui. Cada uma tem o motivo, para não ser quebrada sem saber o custo.
 - **Teste final em clone limpo:** antes da entrega, `git clone` numa pasta nova e
   `docker compose up` do zero. É o único jeito de provar que nada depende de um arquivo que
   só existe na máquina de quem desenvolveu.
+- **Código novo roda fora do Docker antes do `docker compose up`, inclusive o caminho de
+  erro.** Linha que só roda em erro (validação, `catch`, middleware de erro) precisa rodar ao
+  menos uma vez no teste. Fora do Docker, rode `npx prisma generate` na pasta `backend` depois
+  de clonar ou de mudar o schema: sem o client gerado, os erros do Prisma não são reconhecidos.
 - **Obrigatório antes de opcional.** A especificação avisa que diferencial inacabado pesa
   contra. A label `optional` marca o que vai além do obrigatório (login JWT, CI, deploy), e
   issue com ela só começa com o obrigatório pronto. **Exceção: o login JWT.** A
@@ -222,8 +226,8 @@ git checkout staging
 
 ## Regras de código
 
-4. **Comentários explicam o quê e o porquê.** Número de issue (`#43`) não entra no código:
-   fica na issue e no commit.
+4. **Comentários explicam o quê e o porquê**, em tom formal e impessoal, numa linha sempre
+   que possível. Número de issue (`#43`) não entra no código: fica na issue e no commit.
 
 5. **Segurança não é uma fase separada.** Funcionalidade que lida com entrada de usuário,
    autenticação ou dado sensível já nasce com validação. Não se deixa para depois.

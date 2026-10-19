@@ -1,32 +1,23 @@
 # Armadilhas
 
-Armadilhas que já aconteceram neste repositório, principalmente as silenciosas: o que não
-quebra, só entrega errado. Armadilha corrigida não é apagada: recebe a marcação de resolvida,
-para o raciocínio continuar disponível.
-
-As lições que vieram de outros projetos estão no [`AGENTS.md`](../AGENTS.md).
+Falhas silenciosas que já aconteceram neste projeto: o que não quebrou, só entregou errado ou
+passou despercebido. Falha que quebra com mensagem clara não entra aqui. Armadilha corrigida é
+marcada como resolvida, não apagada.
 
 ## Formato de cada item
 
 - **Título:** descreve a armadilha, não a correção.
-- **Sintoma:** o que se via, exatamente como aparecia (mensagem, tela, código HTTP).
+- **Incidente (dd/mm/aaaa):** o que se viu, exatamente como apareceu.
 - **Causa:** por que acontecia.
-- **Pergunta obrigatória:** o que precisa ser respondido antes de mexer naquela área.
-- **Conferência:** o comando ou a consulta que prova que a armadilha não está armada.
+- **O que torna isso silencioso:** por que passou despercebido.
+- **Pergunta obrigatória:** o que responder antes de mexer na área.
+- **Conferência:** o comando que prova que a armadilha não está armada.
 - Quando resolvida, logo abaixo do título: **Resolvida em dd/mm/aaaa**, com o commit.
 
 ---
 
-## Erro de digitação em linha que só roda quando dá erro
+## Armadilhas
 
-- **Sintoma:** nenhum, no uso normal: o projeto sobe e funciona. Só quando o caminho de erro
-  roda aparece `ReferenceError: proccess is not defined`, no lugar da mensagem que o código
-  deveria mostrar.
-- **Causa:** o JavaScript só confere se um nome existe quando a linha é executada. Um
-  `proccess` (com dois `c`) dentro de um `if` de erro ou de um `catch` passa por todos os
-  testes do caminho feliz. Aconteceu na etapa 2 (#1).
-- **Pergunta obrigatória:** o código novo tem linhas que só rodam em erro (`if` de validação,
-  `catch`, middleware de erro)? Elas já rodaram ao menos uma vez?
-- **Conferência:** antes do `docker compose up`, provocar cada erro de propósito (variável
-  faltando, entrada inválida, token errado) e conferir a mensagem. Busca rápida:
-  `grep -rn "proccess" backend/src backend/prisma`.
+Nenhuma ainda. O item sobre o erro de digitação (`proccess`) foi removido em 18/10/2026 por não
+ser uma armadilha: quando a linha roda, o erro aparece com mensagem clara. A lição virou regra
+no [`AGENTS.md`](../AGENTS.md).

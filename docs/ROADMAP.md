@@ -2,14 +2,14 @@
 
 As etapas do teste técnico, o que já está pronto e o que vem depois.
 
-## Status (17/10/2026)
+## Status (18/10/2026)
 
 | Etapa | Status |
 |---|---|
 | 1 · Repositório e documentação | ✅ Concluída |
 | 2 · Banco e infraestrutura | ✅ Concluída |
-| 3 · Base da API e login | 🚧 Próxima |
-| 4 · Equipamentos e dashboard | 🕐 Planejada |
+| 3 · Base da API e login | ✅ Concluída |
+| 4 · Equipamentos e dashboard | 🚧 Próxima |
 | 5 · Solicitações | 🕐 Planejada |
 | 6 · Frontend: login, equipamentos e dashboard | 🕐 Planejada |
 | 7 · Frontend: solicitações e aprovação | 🕐 Planejada |
@@ -50,14 +50,15 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] `docker compose up` do zero funcionando
 - [x] `README.md`: endereço de acesso e usuários de teste
 
-## Etapa 3: Base da API e login
+## Etapa 3: Base da API e login (#2)
 
-- [ ] Formato de erro padronizado em toda a API, com os status HTTP corretos
-- [ ] Validação de entrada com `zod`
-- [ ] Login com JWT e senha com hash (`optional`, ver "O obrigatório"), recusando usuário
+- [x] Formato de erro padronizado em toda a API, com os status HTTP corretos
+- [x] Validação de entrada com `zod`
+- [x] Login com JWT e senha com hash (`optional`, ver "O obrigatório"), recusando usuário
       inativo
-- [ ] Login exigido em toda a `/api`, menos nas rotas de login e de saúde (`/api/health`)
-- [ ] Middleware que exige um perfil (aprovador ou solicitante)
+- [x] Token em cookie `httpOnly`, com `GET /api/me` e `POST /api/logout`
+- [x] Login exigido em toda a `/api`, menos nas rotas de login e de saúde (`/api/health`)
+- [x] Middleware que exige um perfil (aprovador ou solicitante)
 
 ## Etapa 4: Equipamentos e dashboard
 
@@ -109,7 +110,9 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 
 ## Dívida técnica conhecida
 
-Nenhuma ainda.
+- **Login sem limite de tentativas.** Nada impede testar senhas em sequência (força bruta).
+  A especificação não pede essa proteção; a correção, um limite de tentativas por IP ou por
+  e-mail, fica para depois da entrega.
 
 ## Ideias, sem compromisso
 
@@ -121,6 +124,11 @@ Nenhuma ainda.
   não pede; decidir na etapa 5, conforme o tempo.
 
 ## Manutenção
+
+### 18/10/2026: base da API e login (#2)
+
+Formato de erro, validação com `zod` e login com JWT em cookie `httpOnly`, conferidos fora do
+Docker, inclusive nos caminhos de erro, e com `docker compose up` do zero.
 
 ### 17/10/2026: projeto criado
 

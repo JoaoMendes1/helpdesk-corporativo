@@ -20,6 +20,8 @@ services:
     init: true
     environment:
       DATABASE_URL: mysql://${MYSQL_USER:-helpdesk}:${MYSQL_PASSWORD:-helpdesk_dev}@mysql:3306/${MYSQL_DATABASE:-helpdesk}
+      JWT_SECRET: ${JWT_SECRET:-segredo_jwt_ficticio_de_desenvolvimento}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     depends_on:
       mysql:
         condition: service_healthy

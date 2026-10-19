@@ -4,8 +4,9 @@ Como o sistema funciona por dentro. O motivo de cada escolha está no
 [`DECISOES.md`](../DECISOES.md).
 
 **Estado:** 🚧 em construção. Já existem os três containers, o banco com as migrations e o
-seed, e a API mínima (só a rota de saúde). As outras seções passam a descrever o que existe à
-medida que as etapas do [`ROADMAP.md`](ROADMAP.md) ficam prontas.
+seed, e a base da API: formato de erro, validação de entrada e autenticação. As outras seções
+passam a descrever o que existe à medida que as etapas do [`ROADMAP.md`](ROADMAP.md) ficam
+prontas.
 
 ## Visão geral
 
@@ -41,26 +42,55 @@ rota ──> middlewares ──> controller ──> service ──> Prisma ─�
 | Pasta em `backend/src/` | O que fica nela |
 |---|---|
 | `routes/` | Liga cada URL aos middlewares e ao controller. Não tem regra nenhuma |
-| `middlewares/` | Exige login, exige o perfil certo para a rota e transforma qualquer erro na resposta padronizada |
+| `middlewares/` | `autenticar` (exige login), `exigirPerfil` (exige o perfil da rota), `validar` (confere a entrada com um schema) e `tratarErros` (transforma qualquer erro na resposta padronizada) |
+| `schemas/` | Os schemas do `zod` que descrevem a entrada de cada rota |
 | `controllers/` | Lê a requisição (parâmetros, corpo, usuário do token) e monta a resposta HTTP |
 | `services/` | A regra de negócio. É a única camada que fala com o Prisma |
-| `errors/` | Os tipos de erro da aplicação, cada um com o seu status HTTP |
+| `errors/` | O `ErroApp`: o erro previsto pela aplicação, com o status HTTP e, no `400`, os erros por campo |
 | `config/` | Leitura das variáveis de ambiente. Variável obrigatória faltando derruba o boot |
-| `lib/` | Instâncias compartilhadas, como o Prisma Client |
+| `lib/` | Instâncias e funções compartilhadas: o Prisma Client e o `token.js`, que gera e confere o JWT |
 
 O `app.js` monta o Express (middlewares globais e rotas) e o `server.js` só o coloca para
 ouvir a porta. Separados, o app pode ser testado sem subir o servidor.
+
+### Ordem no `app.js`
+
+A ordem das linhas é o mecanismo de proteção das rotas:
+
+```
+express.json → cookie-parser → /api/health → rotas de autenticação → autenticar → rotas protegidas → 404 → tratarErros
+```
+
+- Tudo o que vem antes do `autenticar` é público. O `/me` e o logout ficam no router de
+  autenticação, mas recebem o `autenticar` na própria rota.
+- Toda rota nova entra depois do `autenticar` e nasce protegida.
+- O `404` e o `tratarErros` ficam sempre por último.
+
+### Erros
+
+- O service lança um `ErroApp` com o status e a mensagem. Não há `try/catch` nos
+  controllers: no Express 5, o erro de uma função `async` chega sozinho ao `tratarErros`.
+- O `tratarErros` responde no formato padrão, descrito no [`API.md`](API.md).
+- JSON malformado no corpo vira `400`. Banco inacessível ou conexão perdida viram `503`.
+  Qualquer outro erro vira `500`, com o detalhe só no log.
 
 ## Autenticação
 
 - O usuário entra com e-mail e senha. A senha fica no banco só como hash (`bcryptjs`).
 - Usuário inativo (`ativo = false`) não entra.
-- No login, a API grava um JWT com o id e o perfil do usuário num cookie `httpOnly`. O
-  navegador o envia sozinho em toda requisição, e o JavaScript do frontend não consegue lê-lo.
+- No login, a API grava um JWT num cookie `httpOnly`. O token leva o id, o nome e o perfil, e
+  vale 8 horas, como o cookie. O navegador o envia sozinho em toda requisição, e o JavaScript
+  do frontend não consegue lê-lo.
+- Quando o e-mail não existe, a senha é comparada mesmo assim, com um hash falso. A resposta
+  leva o mesmo tempo de uma senha errada, e o tempo não revela quais e-mails estão
+  cadastrados.
+- A conferência do token aceita só o algoritmo `HS256`: o próprio token não define como é
+  verificado.
 - Ao abrir, o frontend consulta `GET /api/me` para saber quem está logado. O logout também
   passa pela API, que apaga o cookie.
 - O middleware valida o token e coloca o usuário na requisição. **O id e o perfil usados nas
-  regras vêm sempre daí, nunca do corpo, da URL ou da query string.**
+  regras vêm sempre daí, nunca do corpo, da URL ou da query string.** O middleware não
+  consulta o banco: um usuário desativado mantém o acesso até o token vencer.
 - Todas as rotas da `/api` exigem login, menos a de login e a de saúde (`/api/health`).
 - As rotas de cadastro de equipamento e de decisão sobre solicitação exigem também o perfil
   `APROVADOR`. A de criar solicitação exige o perfil `SOLICITANTE`.
@@ -96,6 +126,11 @@ Nenhuma. O sistema não depende de serviço de terceiro.
 Os nomes estão no [`.env.example`](../.env.example). O `docker-compose.yml` traz valores de
 desenvolvimento fictícios, então o `.env` só é necessário para trocar algum deles.
 
+- `JWT_SECRET` é obrigatória e precisa ter pelo menos 32 caracteres; sem ela, o backend não
+  sobe.
+- `COOKIE_SECURE` faz o cookie ser enviado só por HTTPS: `false` no local, que roda em HTTP,
+  e `true` no servidor.
+
 ## Onde o projeto roda
 
 O projeto roda de duas formas, com as mesmas duas imagens: a do `backend/Dockerfile` e a do
@@ -108,7 +143,7 @@ O projeto roda de duas formas, com as mesmas duas imagens: a do `backend/Dockerf
 | **Como sobe** | `docker compose up` | Pelo deploy, descrito abaixo |
 | **Containers** | `frontend`, `backend` e `mysql` | `frontend` e `backend` deste projeto, e um MySQL próprio no compose do `infra` |
 | **Portas** | Só o `frontend` publica porta na máquina | Nenhuma: o Caddy do servidor alcança o `frontend` pela rede interna |
-| **Variáveis** | Valores de desenvolvimento no compose, ou um `.env` copiado do `.env.example` | O `.env` do servidor |
+| **Variáveis** | Valores de desenvolvimento no compose, ou um `.env` copiado do `.env.example` | O `.env` do servidor, com `COOKIE_SECURE=true` |
 
 O nome do serviço do backend muda de um lado para o outro. Por isso o Caddyfile do frontend
 lê o endereço do backend de uma variável, e a mesma imagem funciona nos dois.
