@@ -1,0 +1,973 @@
+<!doctype html>
+<!--
+  Protótipo navegável do HelpDesk Corporativo (v1).
+  Abre direto no navegador, sem servidor e sem fonte externa. Os dados são fictícios: os mesmos do seed.
+  A barra escura no topo não faz parte do sistema: troca a tela, o perfil e o estado da página.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>HelpDesk Corporativo · protótipo</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f7f8f9;
+  --fg: #1e2939;
+  --muted: #6a7282;
+  --ink-2: #4a5565;
+  --line: #e4e6ea;
+  --line-strong: #c9ced6;
+  --brand: #78a118;          /* verde da marca: destaques, foco, ícones */
+  --brand-btn: #587a11;      /* fundo dos botões: contraste AA com texto branco */
+  --brand-btn-hover: #4f6d10;
+  --brand-ink: #4f6d10;      /* texto verde sobre fundo claro */
+  --brand-050: #eef5df;
+  --accent: #59c935;
+  --azul: #1d4f9c;           /* texto da marca do produto */
+  --marca-fundo: #1d4f9c;
+  --recolher: #2c6e8f;
+  --item: #2d3748;
+  --perigo: #b42318;
+  --toast: #1e2939;
+  --menu-bg: #fafafa;
+  --hover: #f0f1f3;
+  --ok-bg: #e7f8e0;   --ok-ink: #3c7a12;
+  --info-bg: #e6f0f5; --info-ink: #2c6e8f;
+  --warn-bg: #fdf3e1; --warn-ink: #8a5a12;
+  --crit-bg: #fdecea; --crit-ink: #b42318;
+  --off-bg: #eef0f3;  --off-ink: #4a5565;
+  --shadow: 0 1px 2px rgba(30,41,57,.05), 0 1px 12px rgba(30,41,57,.05);
+  --font: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color-scheme: light;
+}
+/* Tema escuro: opção "Modo escuro" no menu do usuário ou na barra do protótipo. */
+:root[data-tema="escuro"] {
+  color-scheme: dark;
+  --bg: #13171d;
+  --surface: #1a1f27;
+  --surface-2: #222833;
+  --fg: #e6e9ee;
+  --muted: #9aa3b2;
+  --ink-2: #c3c9d3;
+  --line: #2b323d;
+  --line-strong: #3b4451;
+  --brand: #8db82a;
+  --brand-btn: #587a11;
+  --brand-btn-hover: #6a8f16;
+  --brand-ink: #a9d24a;
+  --brand-050: #26311a;
+  --azul: #7aa8ee;
+  --item: #d6dbe3;
+  --toast: #2b323d;
+  --menu-bg: #161a21;
+  --hover: #252c37;
+  --ok-bg: #1c3218;   --ok-ink: #7fdc5e;
+  --info-bg: #1b2c36; --info-ink: #6fb3d6;
+  --warn-bg: #33270f; --warn-ink: #e0b050;
+  --crit-bg: #3a1a17; --crit-ink: #f07070;
+  --off-bg: #2b323d;  --off-ink: #c3c9d3;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 12px rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 14.5px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+.tnum { font-variant-numeric: tabular-nums; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ===== Barra do protótipo (fora do sistema) ===== */
+.proto { position: sticky; top: 0; z-index: 60; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 16px;
+  background: #1e2939; color: #e6e9ee; font-size: 12.5px; }
+.proto b { color: #fff; }
+.proto-tag { background: #59c935; color: #10200a; font-weight: 800; border-radius: 4px; padding: 2px 7px; font-size: 11px; letter-spacing: .4px; text-transform: uppercase; }
+.proto label { display: inline-flex; align-items: center; gap: 6px; color: #aab2bf; }
+.proto select { background: #2b323d; color: #fff; border: 1px solid #3b4451; border-radius: 6px; padding: 4px 6px; font-size: 12.5px; }
+.proto-seg { display: inline-flex; border: 1px solid #3b4451; border-radius: 6px; overflow: hidden; }
+.proto-seg button { background: #2b323d; color: #c3c9d3; border: 0; padding: 4px 10px; font-size: 12.5px; cursor: pointer; }
+.proto-seg button + button { border-left: 1px solid #3b4451; }
+.proto-seg button[aria-pressed="true"] { background: #59c935; color: #10200a; font-weight: 700; }
+.proto-aviso { margin-left: auto; color: #aab2bf; }
+
+/* ===== Casca: cabeçalho e menu lateral ===== */
+.top { position: sticky; top: var(--proto-h, 41px); z-index: 30; height: 64px; display: flex; align-items: center; background: var(--surface);
+  border-bottom: 1px solid var(--line); box-shadow: 0 1px 4px rgba(30,41,57,.05); }
+.marca { position: relative; width: 240px; height: 100%; flex: none; display: flex; align-items: center; gap: 10px; padding-left: 22px; transition: width .2s, padding .2s; }
+.marca-ic { width: 32px; height: 32px; border-radius: 9px; background: var(--marca-fundo); display: grid; place-items: center; flex: none; }
+.marca-ic span { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(255,255,255,.18); }
+.marca-txt { display: flex; flex-direction: column; line-height: 1.1; white-space: nowrap; }
+.marca-txt b { font-size: 17px; font-weight: 800; color: var(--azul); letter-spacing: -.3px; }
+.marca-txt small { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .6px; text-transform: uppercase; }
+.recolher { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; border: 0; padding: 0;
+  background: var(--recolher); color: #fff; display: grid; place-items: center; cursor: pointer; z-index: 2; }
+.top-d { margin-left: auto; display: flex; align-items: center; gap: 14px; padding-right: 24px; }
+.top-sep { width: 1px; height: 30px; background: var(--line); }
+.usuario { position: relative; }
+.usuario-b { display: flex; align-items: center; gap: 10px; border: 0; background: none; cursor: pointer; padding: 4px 6px; border-radius: 10px; text-align: right; }
+.usuario-b:hover { background: var(--hover); }
+.usuario-n { display: flex; flex-direction: column; line-height: 1.2; }
+.usuario-n b { font-size: 13px; }
+.usuario-n small { font-size: 11.5px; color: var(--muted); }
+.avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--brand-050); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 13px; flex: none; }
+.um { position: absolute; top: calc(100% + 8px); right: 0; width: 240px; z-index: 35; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.16); padding: 6px 0; }
+.um-id { padding: 8px 14px 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; font-size: 12.5px; color: var(--muted); }
+.um-id b { display: block; color: var(--fg); font-size: 13.5px; }
+.um-i { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 14px; border: 0; background: none; cursor: pointer; text-align: left; font-size: 13.5px; }
+.um-i:hover { background: var(--hover); }
+.um-i .lado { margin-left: auto; color: var(--muted); display: grid; place-items: center; }
+
+.corpo { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: calc(100vh - 64px - var(--proto-h, 41px)); transition: grid-template-columns .2s; }
+.menu { position: sticky; top: calc(64px + var(--proto-h, 41px)); height: calc(100vh - 64px - var(--proto-h, 41px)); background: var(--menu-bg);
+  border-right: 1px solid var(--line); overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+.nav { padding: 16px 10px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.nav-grupo { margin: 14px 10px 6px; font-size: 10.5px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.item { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border: 0; border-radius: 7px; background: transparent; cursor: pointer;
+  font-size: 13.5px; font-weight: 600; color: var(--item); text-align: left; white-space: nowrap; position: relative; }
+.item:hover { background: var(--hover); }
+.item[aria-current="page"] { background: var(--brand-050); color: var(--brand-ink); }
+.item[aria-current="page"]::before { content: ''; position: absolute; left: -10px; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--brand); }
+.item-ic { display: grid; place-items: center; flex: none; color: var(--ink-2); }
+.item[aria-current="page"] .item-ic { color: var(--brand-ink); }
+.item-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.item-n { font-size: 11px; font-weight: 800; border-radius: 999px; padding: 1px 7px; background: var(--warn-bg); color: var(--warn-ink); }
+.recolhido .marca { width: 64px; padding-left: 16px; }
+.recolhido .marca-txt { display: none; }
+.recolhido .corpo { grid-template-columns: 64px minmax(0, 1fr); }
+.recolhido .item { justify-content: center; padding: 10px 0; }
+.recolhido .item-txt, .recolhido .nav-grupo, .recolhido .item-n { display: none; }
+
+/* ===== Página ===== */
+.main { padding: 26px clamp(16px, 3vw, 40px) 48px; min-width: 0; }
+.pg-h { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+.pg-sec { margin: 0 0 4px; font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--brand-ink); }
+.pg-h h1 { font-size: 26px; font-weight: 650; letter-spacing: -.3px; }
+.pg-sub { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+
+.btn { display: inline-flex; align-items: center; gap: 7px; background: var(--brand-btn); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px;
+  font-weight: 700; font-size: 13.5px; cursor: pointer; white-space: nowrap; }
+.btn:hover { background: var(--brand-btn-hover); }
+.btn:disabled { opacity: .6; cursor: progress; }
+.btn-sec { background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); }
+.btn-sec:hover { background: var(--surface-2); border-color: var(--brand); }
+.btn-perigo { background: var(--perigo); }
+.btn-perigo:hover { background: color-mix(in srgb, var(--perigo) 82%, #000); }
+.btn-p { padding: 7px 12px; font-size: 12.5px; }
+.lnk { border: 0; background: none; padding: 0; color: var(--brand-ink); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; font-size: inherit; }
+
+/* cartões do painel */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.kpi { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 4px; cursor: pointer; color: var(--fg); position: relative; overflow: hidden; }
+.kpi::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c); }
+.kpi:hover { border-color: var(--c); }
+.kpi-l { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+.kpi-n { font-size: 32px; font-weight: 750; line-height: 1.1; }
+.kpi-t { font-size: 12.5px; color: var(--muted); }
+.paineis { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 18px 20px; min-width: 0; }
+.card h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.card .pg-sub { margin: 0 0 14px; }
+.dist { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--surface-2); margin: 6px 0 14px; }
+.dist span { display: block; height: 100%; }
+.leg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
+.leg-i { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.leg-i i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.leg-i b { margin-left: auto; }
+.lista-c { display: flex; flex-direction: column; }
+.lista-c > div { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; }
+.lista-c > div:first-child { border-top: 0; }
+.lista-c .grow { flex: 1; min-width: 0; }
+.lista-c small { color: var(--muted); display: block; }
+
+/* filtros */
+.fbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 14px; padding: 14px 16px; margin-bottom: 16px; background: var(--surface-2);
+  border: 1px solid var(--line); border-radius: 10px; }
+.fbar .campo { width: 220px; }
+.fbar .conta { margin-left: auto; font-size: 13px; color: var(--muted); padding-bottom: 9px; }
+
+/* campos */
+.campo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.campo > label, .campo-l { font-size: 11.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--ink-2); }
+.campo-l small, .campo > label small { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--muted); }
+.input, .select, .textarea { width: 100%; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 8px; padding: 9px 11px; min-width: 0; }
+.textarea { resize: vertical; min-height: 84px; }
+.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-050); }
+.invalido .input, .invalido .select, .invalido .textarea { border-color: var(--crit-ink); }
+.invalido .input:focus, .invalido .select:focus, .invalido .textarea:focus { box-shadow: 0 0 0 3px var(--crit-bg); }
+.erro-campo { font-size: 12.5px; color: var(--crit-ink); margin: 0; display: none; }
+.invalido .erro-campo { display: block; }
+.dica { font-size: 12.5px; color: var(--muted); margin: 0; }
+.form { max-width: 640px; display: flex; flex-direction: column; gap: 16px; }
+.form-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.form-acoes { display: flex; gap: 10px; justify-content: flex-end; padding-top: 6px; border-top: 1px solid var(--line); margin-top: 4px; padding-top: 16px; }
+
+/* avisos */
+.alerta { display: flex; gap: 10px; align-items: flex-start; border-radius: 10px; padding: 12px 14px; font-size: 13px; border: 1px solid; }
+.alerta.crit { background: var(--crit-bg); border-color: color-mix(in srgb, var(--crit-ink) 30%, transparent); color: var(--crit-ink); }
+.alerta.info { background: var(--info-bg); border-color: color-mix(in srgb, var(--info-ink) 30%, transparent); color: var(--info-ink); }
+.alerta.ok { background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok-ink) 30%, transparent); color: var(--ok-ink); }
+.alerta b { display: block; }
+
+/* tabela */
+.tabela-w { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 11.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--ink-2); padding: 11px 16px;
+  background: var(--surface-2); border-bottom: 1px solid var(--line); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr.clicavel { cursor: pointer; }
+tbody tr.clicavel:hover { background: var(--surface-2); }
+tbody tr.novo { animation: realce 2.2s ease-out; }
+@keyframes realce { from { background: var(--brand-050); } to { background: transparent; } }
+.eq-n { font-weight: 700; }
+.col-id { width: 72px; color: var(--muted); font-weight: 600; }
+.col-acao { text-align: right; width: 1%; white-space: nowrap; color: var(--muted); }
+
+/* etiquetas de status */
+.st { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 800; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.st::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st.DISPONIVEL, .st.APROVADA { background: var(--ok-bg); color: var(--ok-ink); }
+.st.EMPRESTADO { background: var(--info-bg); color: var(--info-ink); }
+.st.MANUTENCAO, .st.PENDENTE { background: var(--warn-bg); color: var(--warn-ink); }
+.st.INATIVO, .st.CANCELADA { background: var(--off-bg); color: var(--off-ink); }
+.st.RECUSADA { background: var(--crit-bg); color: var(--crit-ink); }
+
+/* solicitações */
+.sols { display: flex; flex-direction: column; gap: 10px; }
+.sol { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+.sol-h { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; padding: 14px 18px; align-items: start; }
+.sol-t { font-weight: 700; font-size: 16px; }
+.sol-id { color: var(--muted); font-weight: 600; margin-right: 6px; }
+.sol-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.sol-meta b { color: var(--fg); font-weight: 600; }
+.sol-d { margin: 6px 0 0; font-size: 14px; color: var(--ink-2); }
+.info { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 20px; padding: 14px 18px; border-top: 1px solid var(--line); background: var(--surface-2); }
+.info-i { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.info-l { font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); }
+.info-v { font-size: 14px; font-weight: 600; color: var(--fg); }
+.info-v.fraco { font-weight: 500; color: var(--ink-2); }
+.info-s { font-size: 12.5px; color: var(--muted); }
+.ficha { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; background: var(--surface-2); }
+.ficha .info-i:first-child { grid-column: 1 / -1; }
+.sol-lado { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.sol-obs { margin: 0 18px 14px; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); border-left: 3px solid var(--line-strong); font-size: 13px; }
+.sol-obs.RECUSADA { border-left-color: var(--crit-ink); }
+.sol-obs.APROVADA { border-left-color: var(--ok-ink); }
+.sol-obs small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.sol-acoes { display: flex; gap: 8px; padding: 14px 18px; flex-wrap: wrap; }
+.hist { border-top: 1px solid var(--line); }
+.hist > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 18px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+.hist > summary::-webkit-details-marker { display: none; }
+.hist > summary:hover { background: var(--surface-2); }
+.hist[open] > summary svg { transform: rotate(90deg); }
+.hist > summary svg { transition: transform .15s; }
+.linha { list-style: none; margin: 0; padding: 4px 18px 16px 30px; position: relative; }
+.linha::before { content: ''; position: absolute; left: 23px; top: 10px; bottom: 22px; width: 2px; background: var(--line); }
+.linha li { position: relative; padding: 6px 0 6px 18px; font-size: 13px; }
+.linha li::before { content: ''; position: absolute; left: -11px; top: 11px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--brand); }
+.linha small { color: var(--muted); display: block; }
+.linha q { display: block; margin-top: 3px; color: var(--ink-2); quotes: '“' '”'; }
+
+/* estados */
+.vazio { text-align: center; padding: 48px 20px; color: var(--muted); background: var(--surface); border: 1px dashed var(--line-strong); border-radius: 12px; }
+.vazio h3 { color: var(--fg); font-size: 16px; margin-bottom: 6px; }
+.vazio .btn { margin-top: 14px; }
+.esq { background: linear-gradient(90deg, var(--surface-2) 0%, var(--line) 50%, var(--surface-2) 100%); background-size: 200% 100%; animation: brilho 1.2s infinite linear; border-radius: 6px; height: 14px; }
+@keyframes brilho { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.esq-kpi { height: 108px; border-radius: 12px; }
+.esq-linha { display: flex; gap: 16px; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); }
+.carregando-t { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+.giro { width: 16px; height: 16px; border: 2px solid var(--line-strong); border-top-color: var(--brand-btn); border-radius: 50%; animation: giro .8s linear infinite; }
+@keyframes giro { to { transform: rotate(360deg); } }
+
+/* painel lateral e janelas */
+.fundo { position: fixed; inset: 0; background: rgba(30,41,57,.45); z-index: 70; }
+.gaveta { position: fixed; top: 0; right: 0; height: 100%; width: min(480px, 100vw); z-index: 80; background: var(--surface); box-shadow: -8px 0 30px rgba(30,41,57,.2);
+  display: flex; flex-direction: column; }
+.gaveta-h { padding: 18px 20px; border-bottom: 2px solid var(--brand); display: flex; gap: 12px; align-items: flex-start; }
+.gaveta-h h2 { font-size: 18px; }
+.fechar { margin-left: auto; flex: none; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--muted); font-size: 18px; cursor: pointer; }
+.fechar:hover { color: var(--crit-ink); border-color: var(--crit-ink); }
+.gaveta-b { padding: 18px 20px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+.dl { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 10px 14px; margin: 0; font-size: 13.5px; }
+.dl dt { font-size: 11.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.dl dd { margin: 0; }
+.sec-t { font-size: 11.5px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.caixa { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface-2); font-size: 13.5px; }
+.dialogo { position: fixed; inset: 0; margin: auto; z-index: 80; width: min(520px, calc(100vw - 32px)); height: fit-content; max-height: calc(100vh - 48px); overflow-y: auto;
+  background: var(--surface); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.dialogo-h { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+.dialogo-h h2 { font-size: 17px; }
+.dialogo-b { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.dialogo-f { padding: 14px 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* aviso temporário */
+.toasts { position: fixed; bottom: 20px; right: 20px; z-index: 90; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--toast); color: #fff; border: 1px solid rgba(255,255,255,.08); padding: 11px 16px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.25); font-size: 13.5px; display: flex; gap: 10px; align-items: center; }
+.toast i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+
+/* login */
+.login { min-height: calc(100vh - var(--proto-h, 41px)); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.login-arte { background: linear-gradient(160deg, #1d4f9c 0%, #163d78 60%, #12315f 100%); color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.login-arte::after { content: ''; position: absolute; right: -120px; bottom: -120px; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(circle, rgba(89,201,53,.55), rgba(89,201,53,0) 70%); }
+.login-sec { margin: 0 0 10px; font-size: 12px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: #a9e08f; }
+.login-arte h2 { font-size: 34px; font-weight: 800; letter-spacing: -.6px; line-height: 1.15; }
+.login-arte p { color: #c9d6ee; max-width: 440px; font-size: 15px; margin: 14px 0 0; }
+.login-arte ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 1; }
+.login-arte li { display: flex; gap: 10px; align-items: center; color: #e2e9f6; font-size: 14px; }
+.login-arte li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.login-f { display: grid; place-items: center; padding: 40px 24px; }
+.login-c { width: min(380px, 100%); display: flex; flex-direction: column; gap: 16px; }
+.login-c h1 { font-size: 24px; }
+.login-c .btn { justify-content: center; width: 100%; padding: 12px; }
+.teste { border: 1px dashed var(--line-strong); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: var(--muted); }
+.teste b { color: var(--fg); }
+.teste button { border: 0; background: none; padding: 2px 0; cursor: pointer; color: var(--brand-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; font-size: 12.5px; }
+.teste-l { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; }
+
+/* ===== Telas menores ===== */
+@media (max-width: 1000px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .paineis { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .marca { width: 64px; padding-left: 16px; }
+  .marca-txt, .recolher { display: none; }
+  .corpo { grid-template-columns: 64px minmax(0, 1fr); }
+  .item { justify-content: center; padding: 10px 0; }
+  .item-txt, .nav-grupo, .item-n { display: none; }
+  .usuario-n { display: none; }
+  .login { grid-template-columns: 1fr; }
+  .login-arte { display: none; }
+  .proto-aviso { margin-left: 0; }
+}
+@media (max-width: 640px) {
+  .main { padding: 18px 14px 40px; }
+  .form-g, .leg { grid-template-columns: 1fr; }
+  .fbar .campo { width: 100%; }
+  .fbar .conta { margin-left: 0; padding-bottom: 0; }
+  .sol-h { grid-template-columns: 1fr; }
+  .sol-lado { align-items: flex-start; flex-direction: row; }
+  thead { display: none; }
+  table, tbody, tr, td { display: block; width: 100%; }
+  tbody tr { padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  td { border: 0; padding: 3px 0; }
+  td[data-l]::before { content: attr(data-l) ': '; font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .col-acao { display: none; }
+  .dl { grid-template-columns: 1fr; gap: 2px; }
+  .dl dd { margin-bottom: 8px; }
+  .top-d { padding-right: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="proto" id="proto" role="region" aria-label="Controles do protótipo">
+  <span class="proto-tag">Protótipo</span>
+  <label>Tela
+    <select id="p-tela">
+      <option value="login">Login</option>
+      <option value="painel">Painel</option>
+      <option value="equipamentos">Equipamentos</option>
+      <option value="novo-equipamento">Novo equipamento</option>
+      <option value="minhas">Minhas solicitações</option>
+      <option value="nova">Nova solicitação</option>
+      <option value="pendentes">Solicitações pendentes</option>
+    </select>
+  </label>
+  <span>Perfil
+    <span class="proto-seg" id="p-perfil">
+      <button type="button" data-v="APROVADOR">Aprovador</button><button type="button" data-v="SOLICITANTE">Solicitante</button>
+    </span>
+  </span>
+  <span>Estado
+    <span class="proto-seg" id="p-estado">
+      <button type="button" data-v="normal">Normal</button><button type="button" data-v="carregando">Carregando</button><button type="button" data-v="erro">Erro</button><button type="button" data-v="vazio">Vazio</button><button type="button" data-v="conflito" title="Outro aprovador age antes: resposta 409">Conflito (409)</button>
+    </span>
+  </span>
+  <span>Tema
+    <span class="proto-seg" id="p-tema">
+      <button type="button" data-v="claro">Claro</button><button type="button" data-v="escuro">Escuro</button>
+    </span>
+  </span>
+  <span class="proto-aviso" title="Os mesmos dados do seed">Dados fictícios. Nada é gravado.</span>
+</div>
+<div id="app"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+// ===== Dados fictícios (os mesmos do seed) =====
+const HOJE = new Date(2026, 9, 19);
+const dias = (n) => new Date(HOJE.getTime() - n * 864e5);
+const USUARIOS = [
+  { id: 1, nome: 'Ana Souza', email: 'aprovador@example.com', perfil: 'APROVADOR', ativo: true },
+  { id: 2, nome: 'Bruno Lima', email: 'solicitante@example.com', perfil: 'SOLICITANTE', ativo: true },
+  { id: 3, nome: 'Cristina Rocha', email: 'cristina@example.com', perfil: 'SOLICITANTE', ativo: true },
+  { id: 4, nome: 'Ronaldo Souza', email: 'inativo@example.com', perfil: 'SOLICITANTE', ativo: false },
+];
+const SENHA = 'Senha@123';
+const CADASTRO = dias(2);
+const EQUIPAMENTOS = [
+  { id: 1, marca: 'Lenovo', modelo: 'ThinkPad E14', tipo: 'notebook', status: 'EMPRESTADO' },
+  { id: 2, marca: 'Dell', modelo: 'Latitude 5440', tipo: 'notebook', status: 'DISPONIVEL' },
+  { id: 3, marca: 'HP', modelo: 'EliteBook 840', tipo: 'notebook', status: 'MANUTENCAO' },
+  { id: 4, marca: 'Dell', modelo: 'P2422H', tipo: 'monitor', status: 'DISPONIVEL' },
+  { id: 5, marca: 'LG', modelo: '24MK430H', tipo: 'monitor', status: 'DISPONIVEL' },
+  { id: 6, marca: 'Logitech', modelo: 'MK270', tipo: 'teclado e mouse', status: 'DISPONIVEL' },
+  { id: 7, marca: 'Samsung', modelo: 'Galaxy A15', tipo: 'celular', status: 'DISPONIVEL' },
+  { id: 8, marca: 'Apple', modelo: 'iPad 10', tipo: 'tablet', status: 'INATIVO' },
+  { id: 9, marca: 'Epson', modelo: 'L3250', tipo: 'impressora', status: 'MANUTENCAO' },
+  { id: 10, marca: 'Dell', modelo: 'OptiPlex 7010', tipo: 'desktop', status: 'DISPONIVEL' },
+].map((e) => ({ ...e, dtCadastro: CADASTRO, criadoPorId: 1 }));
+const SOLICITACOES = [
+  { id: 1, solicitanteId: 2, equipamentoId: 1, descricao: 'Notebook para o trabalho remoto.', tipoSolicitado: 'notebook', status: 'APROVADA', observacao: 'Liberado para o home office.',
+    dtSolicitacao: dias(10), dtDecisao: dias(9), aprovadorId: 1,
+    historico: [{ usuarioId: 2, de: null, para: 'PENDENTE', em: dias(10) }, { usuarioId: 1, de: 'PENDENTE', para: 'APROVADA', em: dias(9), obs: 'Liberado para o home office.' }] },
+  { id: 2, solicitanteId: 2, equipamentoId: null, descricao: 'Notebook para edição de vídeo.', marcaSolicitada: 'Apple', modeloSolicitado: 'MacBook Pro', tipoSolicitado: 'notebook',
+    status: 'RECUSADA', observacao: 'Não há MacBook no estoque; o notebook padrão atende ao uso.', dtSolicitacao: dias(6), dtDecisao: dias(5), aprovadorId: 1,
+    historico: [{ usuarioId: 2, de: null, para: 'PENDENTE', em: dias(6) }, { usuarioId: 1, de: 'PENDENTE', para: 'RECUSADA', em: dias(5), obs: 'Não há MacBook no estoque; o notebook padrão atende ao uso.' }] },
+  { id: 3, solicitanteId: 3, equipamentoId: null, descricao: 'Kit de teclado e mouse.', tipoSolicitado: 'teclado e mouse', status: 'CANCELADA', dtSolicitacao: dias(4),
+    historico: [{ usuarioId: 3, de: null, para: 'PENDENTE', em: dias(4) }, { usuarioId: 3, de: 'PENDENTE', para: 'CANCELADA', em: dias(3), obs: 'Consegui um kit emprestado com a equipe.' }] },
+  { id: 4, solicitanteId: 3, equipamentoId: null, descricao: 'Notebook para um treinamento externo.', tipoSolicitado: 'notebook', status: 'PENDENTE', dtSolicitacao: dias(2),
+    historico: [{ usuarioId: 3, de: null, para: 'PENDENTE', em: dias(2) }] },
+  { id: 5, solicitanteId: 2, equipamentoId: null, descricao: 'Monitor extra para a mesa.', tipoSolicitado: 'monitor', status: 'PENDENTE', dtSolicitacao: dias(1),
+    historico: [{ usuarioId: 2, de: null, para: 'PENDENTE', em: dias(1) }] },
+];
+
+const STATUS_EQ = { DISPONIVEL: 'Disponível', EMPRESTADO: 'Emprestado', MANUTENCAO: 'Em manutenção', INATIVO: 'Inativo' };
+const STATUS_SOL = { PENDENTE: 'Pendente', APROVADA: 'Aprovada', RECUSADA: 'Recusada', CANCELADA: 'Cancelada' };
+const COR_EQ = { DISPONIVEL: '#59c935', EMPRESTADO: '#2c6e8f', MANUTENCAO: '#d39b2a', INATIVO: '#a3abb8' };
+
+// ===== Estado do protótipo =====
+const S = {
+  tela: 'login', perfil: 'APROVADOR', estado: 'normal', recolhido: false,
+  filtro: { status: '', tipo: '' }, destaque: null, sobreposto: null, erroLogin: null, tema: temaInicial(),
+};
+// Preferência do navegador na primeira visita; depois, a escolha salva.
+function temaInicial() {
+  try { const t = localStorage.getItem('helpdesk-tema'); if (t === 'claro' || t === 'escuro') return t; } catch {}
+  return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro';
+}
+function trocarTema(t) {
+  S.tema = t;
+  try { localStorage.setItem('helpdesk-tema', t); } catch {}
+  render();
+}
+const usuario = () => USUARIOS.find((u) => u.perfil === S.perfil && u.ativo);
+const nomeDe = (id) => (USUARIOS.find((u) => u.id === id) || {}).nome;
+const eqDe = (id) => EQUIPAMENTOS.find((e) => e.id === id);
+const fmtData = (d) => d.toLocaleDateString('pt-BR');
+const iniciais = (n) => n.split(' ').map((p) => p[0]).slice(0, 2).join('');
+const cap = (t) => (t ? t.charAt(0).toUpperCase() + t.slice(1) : t);
+const tipos = () => [...new Set(EQUIPAMENTOS.map((e) => e.tipo))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+// ===== Utilidades de DOM =====
+function el(tag, attrs, ...filhos) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (k === 'html') n.innerHTML = v;
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  for (const f of filhos.flat()) if (f != null && f !== false) n.append(f.nodeType ? f : document.createTextNode(f));
+  return n;
+}
+const ic = (d, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const I = {
+  painel: '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  equip: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  mais: '<path d="M12 5v14M5 12h14"/>',
+  lista: '<path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/>',
+  caixa: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  sair: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  seta: '<path d="m9 18 6-6-6-6"/>',
+  setaE: '<path d="m15 18-6-6 6-6"/>',
+  alerta: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  lua: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sol: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+};
+
+function toast(msg) {
+  const t = el('div', { class: 'toast', role: 'status' }, el('i'), msg);
+  document.getElementById('toasts').append(t);
+  setTimeout(() => t.remove(), 3200);
+}
+// Simula a espera da API num botão: desabilita, troca o texto e executa depois.
+function aguardar(botao, texto, depois) {
+  const original = botao.textContent;
+  botao.disabled = true; botao.textContent = texto;
+  setTimeout(() => { botao.disabled = false; botao.textContent = original; depois(); }, 650);
+}
+
+// Visualizadores em iframe sem permissão de formulário bloqueiam o submit, e o evento não chega.
+// O clique no botão e o Enter disparam um submit sintético, que funciona nos dois casos.
+function semSubmit(form) {
+  const enviar = () => form.dispatchEvent(new Event('submit', { cancelable: true }));
+  form.querySelector('button[type=submit]').addEventListener('click', (ev) => { ev.preventDefault(); enviar(); });
+  form.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' && ev.target.tagName === 'INPUT' && ev.target.type !== 'radio') { ev.preventDefault(); enviar(); }
+  });
+  return form;
+}
+
+// ===== Navegação =====
+const TELAS = {
+  painel: { titulo: 'Painel', sec: 'Visão geral', perfis: 'APROVADOR' },
+  equipamentos: { titulo: 'Equipamentos', sec: 'Inventário', perfis: 'APROVADOR' },
+  'novo-equipamento': { titulo: 'Novo equipamento', sec: 'Inventário', perfis: 'APROVADOR' },
+  minhas: { titulo: 'Minhas solicitações', sec: 'Solicitações', perfis: 'SOLICITANTE' },
+  nova: { titulo: 'Nova solicitação', sec: 'Solicitações', perfis: 'SOLICITANTE' },
+  pendentes: { titulo: 'Solicitações pendentes', sec: 'Solicitações', perfis: 'APROVADOR' },
+};
+function ir(tela) { S.tela = tela; S.sobreposto = null; render(); window.scrollTo(0, 0); }
+// O solicitante não vê o estoque: começa nas próprias solicitações.
+const inicio = () => (S.perfil === 'APROVADOR' ? 'painel' : 'minhas');
+
+function render() {
+  const app = document.getElementById('app');
+  app.replaceChildren();
+  document.body.classList.toggle('recolhido', S.recolhido);
+  document.documentElement.dataset.tema = S.tema;
+  for (const b of document.querySelectorAll('#p-tema button')) b.setAttribute('aria-pressed', String(b.dataset.v === S.tema));
+  document.getElementById('p-tela').value = S.tela;
+  for (const b of document.querySelectorAll('#p-perfil button')) b.setAttribute('aria-pressed', String(b.dataset.v === S.perfil));
+  for (const b of document.querySelectorAll('#p-estado button')) b.setAttribute('aria-pressed', String(b.dataset.v === S.estado));
+  document.documentElement.style.setProperty('--proto-h', document.getElementById('proto').offsetHeight + 'px');
+  if (S.tela === 'login') { app.append(telaLogin()); return; }
+  app.append(cabecalho(), el('div', { class: 'corpo' }, menu(), el('main', { class: 'main', id: 'conteudo' }, pagina())));
+  if (S.sobreposto) app.append(...S.sobreposto());
+}
+
+function cabecalho() {
+  const u = usuario();
+  const painel = el('div', { class: 'um', hidden: true },
+    el('div', { class: 'um-id' }, el('b', {}, u.nome), u.email),
+    el('button', { class: 'um-i', onclick: () => trocarTema(S.tema === 'escuro' ? 'claro' : 'escuro') },
+      el('span', { html: ic(S.tema === 'escuro' ? I.sol : I.lua, 16) }), S.tema === 'escuro' ? 'Modo claro' : 'Modo escuro'),
+    el('button', { class: 'um-i', onclick: () => { S.erroLogin = null; ir('login'); } }, el('span', { html: ic(I.sair, 16) }), 'Sair'));
+  const botao = el('button', { class: 'usuario-b', 'aria-haspopup': 'true', 'aria-expanded': 'false',
+    onclick: () => { painel.hidden = !painel.hidden; botao.setAttribute('aria-expanded', String(!painel.hidden)); } },
+    el('span', { class: 'usuario-n' }, el('b', {}, u.nome), el('small', {}, u.perfil === 'APROVADOR' ? 'Aprovador' : 'Solicitante')),
+    el('span', { class: 'avatar', 'aria-hidden': 'true' }, iniciais(u.nome)));
+  return el('header', { class: 'top' },
+    el('div', { class: 'marca' },
+      el('span', { class: 'marca-ic', 'aria-hidden': 'true' }, el('span')),
+      el('span', { class: 'marca-txt' }, el('b', {}, 'HelpDesk'), el('small', {}, 'Corporativo')),
+      el('button', { class: 'recolher', 'aria-label': S.recolhido ? 'Expandir menu' : 'Recolher menu', html: ic(S.recolhido ? I.seta : I.setaE, 12),
+        onclick: () => { S.recolhido = !S.recolhido; render(); } })),
+    el('div', { class: 'top-d' }, el('span', { class: 'top-sep', 'aria-hidden': 'true' }), el('div', { class: 'usuario' }, botao, painel)));
+}
+
+function menu() {
+  const pendentes = SOLICITACOES.filter((s) => s.status === 'PENDENTE').length;
+  const item = (tela, icone, texto, n) => el('button', { class: 'item', 'aria-current': S.tela === tela ? 'page' : null, title: S.recolhido ? texto : null, onclick: () => ir(tela) },
+    el('span', { class: 'item-ic', html: ic(icone) }), el('span', { class: 'item-txt' }, texto), n ? el('span', { class: 'item-n' }, String(n)) : null);
+  const nav = S.perfil === 'APROVADOR'
+    ? [item('painel', I.painel, 'Painel'),
+      el('div', { class: 'nav-grupo' }, 'Inventário'),
+      item('equipamentos', I.equip, 'Equipamentos'),
+      item('novo-equipamento', I.mais, 'Novo equipamento'),
+      el('div', { class: 'nav-grupo' }, 'Solicitações'),
+      item('pendentes', I.caixa, 'Pendentes', pendentes)]
+    : [el('div', { class: 'nav-grupo' }, 'Solicitações'),
+      item('minhas', I.lista, 'Minhas solicitações'),
+      item('nova', I.mais, 'Nova solicitação')];
+  return el('aside', { class: 'menu', 'aria-label': 'Menu principal' }, el('nav', { class: 'nav' }, ...nav));
+}
+
+function cabecalhoPagina(acao) {
+  const t = TELAS[S.tela];
+  const sub = {
+    painel: 'Totais de equipamentos por status e o que precisa da sua atenção.',
+    equipamentos: 'Todos os equipamentos cadastrados, com filtros por status e tipo.',
+    'novo-equipamento': 'A data de cadastro e o responsável são registrados automaticamente.',
+    minhas: 'Acompanhe o status e o histórico de cada pedido seu.',
+    nova: 'Descreva o equipamento de que você precisa. O aprovador escolhe qual entregar.',
+    pendentes: 'Pedidos aguardando decisão. A justificativa é obrigatória na recusa.',
+  }[S.tela];
+  return el('div', { class: 'pg-h' },
+    el('div', {}, el('p', { class: 'pg-sec' }, t.sec), el('h1', {}, t.titulo), el('p', { class: 'pg-sub' }, sub)), acao || null);
+}
+
+function pagina() {
+  const t = TELAS[S.tela];
+  if (t.perfis && t.perfis !== S.perfil) return [cabecalhoPagina(), semPermissao()];
+  if (S.estado === 'erro') return [cabecalhoPagina(), erroCarga()];
+  const telas = { painel: telaPainel, equipamentos: telaEquipamentos, 'novo-equipamento': telaNovoEquipamento, minhas: telaMinhas, nova: telaNova, pendentes: telaPendentes };
+  return telas[S.tela]();
+}
+
+// ===== Estados genéricos =====
+function erroCarga() {
+  return el('div', { class: 'alerta crit', role: 'alert' }, el('span', { html: ic(I.alerta) }),
+    el('div', {}, el('b', {}, 'Não foi possível carregar os dados.'), 'Serviço temporariamente indisponível. Tente novamente. ',
+      el('button', { class: 'lnk', onclick: () => { S.estado = 'normal'; render(); } }, 'Tentar novamente')));
+}
+function semPermissao() {
+  return el('div', { class: 'vazio' }, el('h3', {}, 'Seu perfil não tem permissão para esta ação.'),
+    'Esta tela é do perfil ' + (TELAS[S.tela].perfis === 'APROVADOR' ? 'aprovador' : 'solicitante') + '. Na API, a resposta seria 403.',
+    el('div', {}, el('button', { class: 'btn btn-sec', onclick: () => ir(inicio()) }, S.perfil === 'APROVADOR' ? 'Voltar ao painel' : 'Ir para minhas solicitações')));
+}
+const carregando = (texto) => el('div', { class: 'carregando-t', role: 'status' }, el('span', { class: 'giro' }), texto);
+function esqueletoTabela(n = 6) {
+  const linhas = Array.from({ length: n }, () => el('div', { class: 'esq-linha' },
+    el('div', { class: 'esq', style: 'width:28%' }), el('div', { class: 'esq', style: 'width:16%' }), el('div', { class: 'esq', style: 'width:14%' }), el('div', { class: 'esq', style: 'width:12%' })));
+  return el('div', { class: 'tabela-w', 'aria-hidden': 'true' }, ...linhas);
+}
+const badgeEq = (s) => el('span', { class: 'st ' + s }, STATUS_EQ[s]);
+const badgeSol = (s) => el('span', { class: 'st ' + s }, STATUS_SOL[s]);
+
+// ===== Login =====
+function telaLogin() {
+  const email = el('input', { class: 'input', id: 'l-email', type: 'email', autocomplete: 'username', placeholder: 'nome@empresa.com' });
+  const senha = el('input', { class: 'input', id: 'l-senha', type: 'password', autocomplete: 'current-password' });
+  const cEmail = el('div', { class: 'campo' }, el('label', { for: 'l-email' }, 'E-mail'), email, el('p', { class: 'erro-campo' }, 'Informe um e-mail válido.'));
+  const cSenha = el('div', { class: 'campo' }, el('label', { for: 'l-senha' }, 'Senha'), senha, el('p', { class: 'erro-campo' }, 'Informe a senha.'));
+  const erro = el('div', { class: 'alerta crit', role: 'alert', hidden: !S.erroLogin }, el('span', { html: ic(I.alerta) }), el('div', {}, S.erroLogin || ''));
+  const entrar = el('button', { class: 'btn', type: 'submit' }, 'Entrar');
+  const preencher = (e) => { email.value = e; senha.value = SENHA; email.focus(); };
+  const form = el('form', { class: 'login-c', novalidate: true, onsubmit: (ev) => {
+    ev.preventDefault();
+    const e = email.value.trim().toLowerCase();
+    const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e), okSenha = senha.value.length > 0;
+    cEmail.classList.toggle('invalido', !okEmail); cSenha.classList.toggle('invalido', !okSenha);
+    erro.hidden = true;
+    if (!okEmail || !okSenha) return;
+    aguardar(entrar, 'Entrando…', () => {
+      const u = USUARIOS.find((x) => x.email === e);
+      if (!u || senha.value !== SENHA || !u.ativo) {
+        S.erroLogin = 'E-mail ou senha inválidos.';
+        erro.lastChild.textContent = S.erroLogin; erro.hidden = false; return;
+      }
+      S.erroLogin = null; S.perfil = u.perfil; ir(inicio());
+    });
+  } },
+    el('div', {}, el('h1', {}, 'Entrar'), el('p', { class: 'pg-sub' }, 'Use o seu e-mail e a sua senha.')),
+    erro, cEmail, cSenha, entrar,
+    el('div', { class: 'teste' }, el('b', {}, 'Usuários de teste'), ' · senha ', el('b', {}, SENHA),
+      el('div', { class: 'teste-l' },
+        el('button', { type: 'button', onclick: () => preencher('aprovador@example.com') }, 'aprovador'),
+        el('button', { type: 'button', onclick: () => preencher('solicitante@example.com') }, 'solicitante'),
+        el('button', { type: 'button', onclick: () => preencher('inativo@example.com') }, 'inativo (recusado)'))));
+  semSubmit(form);
+  return el('div', { class: 'login' },
+    el('section', { class: 'login-arte' },
+      el('div', {}, el('p', { class: 'login-sec' }, 'Solicitação e aprovação de equipamentos'),
+        el('h2', {}, 'HelpDesk Corporativo'),
+        el('p', {}, 'O solicitante descreve o equipamento de que precisa e acompanha cada pedido. O aprovador cuida do inventário e decide as solicitações, com justificativa.')),
+      el('ul', {}, el('li', {}, 'Pedido com histórico de cada mudança'), el('li', {}, 'Decisão do aprovador com justificativa'), el('li', {}, 'Painel do inventário para o aprovador'))),
+    el('section', { class: 'login-f' }, form));
+}
+
+// ===== Painel =====
+function telaPainel() {
+  if (S.estado === 'carregando') return [cabecalhoPagina(), carregando('Carregando o painel…'),
+    el('div', { class: 'kpis', 'aria-hidden': 'true' }, ...Array.from({ length: 4 }, () => el('div', { class: 'esq esq-kpi' })))];
+  const vazio = S.estado === 'vazio';
+  const cont = Object.fromEntries(Object.keys(STATUS_EQ).map((s) => [s, vazio ? 0 : EQUIPAMENTOS.filter((e) => e.status === s).length]));
+  const total = Object.values(cont).reduce((a, b) => a + b, 0);
+  const textos = { DISPONIVEL: 'Prontos para empréstimo', EMPRESTADO: 'Com algum colaborador', MANUTENCAO: 'Fora de uso temporariamente', INATIVO: 'Baixados do inventário' };
+  if (vazio) return [cabecalhoPagina(), el('div', { class: 'vazio' }, el('h3', {}, 'Nenhum equipamento cadastrado ainda.'),
+    'Cadastre o primeiro equipamento para ver os totais por status aqui.',
+    el('div', {}, el('button', { class: 'btn', onclick: () => ir('novo-equipamento') }, 'Novo equipamento')))];
+  const kpis = el('div', { class: 'kpis' }, ...Object.keys(STATUS_EQ).map((s) => el('button', { class: 'kpi', style: '--c:' + COR_EQ[s],
+    onclick: () => { S.filtro = { status: s, tipo: '' }; ir('equipamentos'); } },
+    el('span', { class: 'kpi-l' }, STATUS_EQ[s]), el('span', { class: 'kpi-n tnum' }, String(cont[s])), el('span', { class: 'kpi-t' }, textos[s]))));
+  const dist = el('div', { class: 'card' }, el('h2', {}, 'Distribuição do inventário'), el('p', { class: 'pg-sub' }, total + ' equipamentos cadastrados'),
+    total ? el('div', { class: 'dist', role: 'img', 'aria-label': Object.keys(STATUS_EQ).map((s) => STATUS_EQ[s] + ' ' + cont[s]).join(', ') },
+      ...Object.keys(STATUS_EQ).map((s) => el('span', { style: `width:${(cont[s] / total) * 100}%;background:${COR_EQ[s]}` }))) : el('div', { class: 'dist' }),
+    el('div', { class: 'leg' }, ...Object.keys(STATUS_EQ).map((s) => el('div', { class: 'leg-i' }, el('i', { style: 'background:' + COR_EQ[s] }), STATUS_EQ[s],
+      el('b', { class: 'tnum' }, total ? Math.round((cont[s] / total) * 100) + '%' : '—')))));
+  const lista = SOLICITACOES.filter((s) => s.status === 'PENDENTE');
+  const lado = el('div', { class: 'card' },
+    el('h2', {}, 'Aguardando a sua decisão'),
+    el('p', { class: 'pg-sub' }, lista.length + (lista.length === 1 ? ' solicitação pendente' : ' solicitações pendentes')),
+    lista.length ? el('div', { class: 'lista-c' }, ...lista.map((s) => el('div', {},
+      el('div', { class: 'grow' }, el('b', {}, '#' + s.id + ' · ' + tituloSol(s)), el('small', {}, nomeDe(s.solicitanteId) + ' · ' + fmtData(s.dtSolicitacao))),
+      badgeSol(s.status))))
+      : el('p', { class: 'dica' }, 'Nenhuma solicitação pendente.'),
+    el('div', { style: 'margin-top:12px' }, el('button', { class: 'lnk', onclick: () => ir('pendentes') }, 'Ver pendentes')));
+  return [cabecalhoPagina(), kpis, el('div', { class: 'paineis' }, dist, lado)];
+}
+
+// ===== Equipamentos =====
+function telaEquipamentos() {
+  const acao = el('button', { class: 'btn', onclick: () => ir('novo-equipamento') }, el('span', { html: ic(I.mais, 16) }), 'Novo equipamento');
+  const sStatus = el('select', { class: 'select', id: 'f-status', onchange: (e) => { S.filtro.status = e.target.value; render(); } },
+    el('option', { value: '' }, 'Todos'), ...Object.keys(STATUS_EQ).map((s) => el('option', { value: s, selected: S.filtro.status === s }, STATUS_EQ[s])));
+  const sTipo = el('select', { class: 'select', id: 'f-tipo', onchange: (e) => { S.filtro.tipo = e.target.value; render(); } },
+    el('option', { value: '' }, 'Todos'), ...tipos().map((t) => el('option', { value: t, selected: S.filtro.tipo === t }, cap(t))));
+  const lista = S.estado === 'vazio' ? [] : EQUIPAMENTOS.filter((e) => (!S.filtro.status || e.status === S.filtro.status) && (!S.filtro.tipo || e.tipo === S.filtro.tipo));
+  const temFiltro = S.filtro.status || S.filtro.tipo;
+  const fbar = el('div', { class: 'fbar' },
+    el('div', { class: 'campo' }, el('label', { for: 'f-status' }, 'Status'), sStatus),
+    el('div', { class: 'campo' }, el('label', { for: 'f-tipo' }, 'Tipo'), sTipo),
+    temFiltro ? el('button', { class: 'btn btn-sec btn-p', onclick: () => { S.filtro = { status: '', tipo: '' }; render(); } }, 'Limpar filtros') : null,
+    el('span', { class: 'conta tnum' }, S.estado === 'carregando' ? '' : lista.length + (lista.length === 1 ? ' equipamento' : ' equipamentos')));
+  if (S.estado === 'carregando') return [cabecalhoPagina(acao), fbar, carregando('Carregando equipamentos…'), esqueletoTabela()];
+  if (!lista.length) return [cabecalhoPagina(acao), fbar, el('div', { class: 'vazio' },
+    el('h3', {}, temFiltro ? 'Nenhum equipamento com esses filtros.' : 'Nenhum equipamento cadastrado.'),
+    temFiltro ? 'Mude ou limpe os filtros para ver mais resultados.' : 'Cadastre o primeiro equipamento do inventário.',
+    el('div', {}, temFiltro ? el('button', { class: 'btn btn-sec', onclick: () => { S.filtro = { status: '', tipo: '' }; render(); } }, 'Limpar filtros')
+      : el('button', { class: 'btn', onclick: () => ir('novo-equipamento') }, 'Novo equipamento')))];
+  const linhas = lista.map((e) => el('tr', { class: 'clicavel' + (S.destaque === e.id ? ' novo' : ''), tabindex: '0',
+    onclick: () => abrirDetalhe(e.id), onkeydown: (ev) => { if (ev.key === 'Enter') abrirDetalhe(e.id); } },
+    el('td', { 'data-l': 'ID', class: 'col-id tnum' }, String(e.id)),
+    el('td', { 'data-l': 'Equipamento' }, el('div', { class: 'eq-n' }, e.marca + ' ' + e.modelo)),
+    el('td', { 'data-l': 'Tipo' }, cap(e.tipo)),
+    el('td', { 'data-l': 'Status' }, badgeEq(e.status)),
+    el('td', { 'data-l': 'Cadastro', class: 'tnum' }, fmtData(e.dtCadastro)),
+    el('td', { class: 'col-acao', html: ic(I.seta, 16) })));
+  S.destaque = null;
+  return [cabecalhoPagina(acao), fbar, el('div', { class: 'tabela-w' }, el('table', {},
+    el('thead', {}, el('tr', {}, el('th', { class: 'col-id' }, 'ID'), el('th', {}, 'Equipamento'), el('th', {}, 'Tipo'), el('th', {}, 'Status'), el('th', {}, 'Cadastro'), el('th', {}, el('span', { class: 'sr' }, 'Abrir')))),
+    el('tbody', {}, ...linhas)))];
+}
+
+function abrirDetalhe(id) {
+  const e = eqDe(id);
+  const emprestimo = e.status === 'EMPRESTADO' ? SOLICITACOES.filter((s) => s.equipamentoId === id && s.status === 'APROVADA').sort((a, b) => b.dtDecisao - a.dtDecisao)[0] : null;
+  const fechar = () => { S.sobreposto = null; render(); };
+  S.sobreposto = () => [el('div', { class: 'fundo', onclick: fechar }), el('aside', { class: 'gaveta', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'g-t' },
+    el('div', { class: 'gaveta-h' }, el('div', {}, el('p', { class: 'pg-sec' }, 'Equipamento #' + e.id), el('h2', { id: 'g-t' }, e.marca + ' ' + e.modelo)),
+      el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: fechar }, '×')),
+    el('div', { class: 'gaveta-b' },
+      el('dl', { class: 'dl' },
+        el('dt', {}, 'Status'), el('dd', {}, badgeEq(e.status)),
+        el('dt', {}, 'Marca'), el('dd', {}, e.marca), el('dt', {}, 'Modelo'), el('dd', {}, e.modelo), el('dt', {}, 'Tipo'), el('dd', {}, cap(e.tipo)),
+        el('dt', {}, 'Cadastrado em'), el('dd', {}, fmtData(e.dtCadastro)),
+        el('dt', {}, 'Cadastrado por'), el('dd', {}, nomeDe(e.criadoPorId))),
+      el('div', {}, el('p', { class: 'sec-t' }, 'Empréstimo atual'),
+        emprestimo ? el('div', { class: 'ficha' },
+          info('Emprestado para', nomeDe(emprestimo.solicitanteId)),
+          info('Desde', fmtData(emprestimo.dtDecisao)),
+          info('Solicitação', '#' + emprestimo.id))
+          : el('div', { class: 'caixa' }, e.status === 'DISPONIVEL' ? 'Não está emprestado. Pode ser escolhido numa solicitação.' : 'Não está emprestado.'))))];
+  render();
+  document.querySelector('.gaveta .fechar').focus();
+}
+
+// ===== Novo equipamento =====
+function telaNovoEquipamento() {
+  const campo = (id, rotulo, ctrl, erro, dica) => el('div', { class: 'campo', id: 'c-' + id }, el('label', { for: id }, rotulo), ctrl, dica ? el('p', { class: 'dica' }, dica) : null, el('p', { class: 'erro-campo' }, erro));
+  const marca = el('input', { class: 'input', id: 'n-marca', placeholder: 'Ex.: Dell' });
+  const modelo = el('input', { class: 'input', id: 'n-modelo', placeholder: 'Ex.: Latitude 5440' });
+  const tipo = el('input', { class: 'input', id: 'n-tipo', list: 'tipos-l', placeholder: 'Ex.: notebook' });
+  const status = el('select', { class: 'select', id: 'n-status' }, ...Object.keys(STATUS_EQ).map((s) => el('option', { value: s, selected: s === 'DISPONIVEL' }, STATUS_EQ[s])));
+  const resumo = el('div', { class: 'alerta crit', role: 'alert', hidden: true }, el('span', { html: ic(I.alerta) }), el('div', {}, el('b', {}, 'Dados inválidos.'), 'Corrija os campos destacados.'));
+  const salvar = el('button', { class: 'btn', type: 'submit' }, 'Cadastrar equipamento');
+  const form = el('form', { class: 'form', novalidate: true, onsubmit: (ev) => {
+    ev.preventDefault();
+    const vals = { marca: marca.value.trim(), modelo: modelo.value.trim(), tipo: tipo.value.trim().toLowerCase() };
+    let ok = true;
+    for (const [k, v] of Object.entries(vals)) { const inv = !v; document.getElementById('c-n-' + k).classList.toggle('invalido', inv); if (inv) ok = false; }
+    resumo.hidden = ok;
+    if (!ok) return;
+    aguardar(salvar, 'Cadastrando…', () => {
+      const id = Math.max(...EQUIPAMENTOS.map((e) => e.id)) + 1;
+      EQUIPAMENTOS.push({ id, ...vals, status: status.value, dtCadastro: HOJE, criadoPorId: usuario().id });
+      S.destaque = id; S.filtro = { status: '', tipo: '' };
+      ir('equipamentos'); toast('Equipamento #' + id + ' cadastrado.');
+    });
+  } },
+    resumo,
+    el('div', { class: 'form-g' }, campo('n-marca', 'Marca', marca, 'Informe a marca.'), campo('n-modelo', 'Modelo', modelo, 'Informe o modelo.')),
+    el('div', { class: 'form-g' }, campo('n-tipo', 'Tipo', tipo, 'Informe o tipo.', 'Use um tipo existente para os filtros agruparem certo.'),
+      campo('n-status', 'Status', status, '', 'Padrão: Disponível.')),
+    el('datalist', { id: 'tipos-l' }, ...tipos().map((t) => el('option', { value: t }))),
+    el('div', { class: 'form-acoes' }, el('button', { class: 'btn btn-sec', type: 'button', onclick: () => ir('equipamentos') }, 'Cancelar'), salvar));
+  semSubmit(form);
+  return [cabecalhoPagina(), form];
+}
+
+// ===== Solicitações =====
+// Título pelo que foi pedido: o tipo e, se informados, a marca e o modelo.
+function tituloSol(s) {
+  return [cap(s.tipoSolicitado), [s.marcaSolicitada, s.modeloSolicitado].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+}
+const nomeEq = (id) => { const e = eqDe(id); return e.marca + ' ' + e.modelo; };
+function info(rotulo, valor, sub, fraco) {
+  return el('div', { class: 'info-i' }, el('span', { class: 'info-l' }, rotulo), el('span', { class: 'info-v' + (fraco ? ' fraco' : '') }, valor), sub ? el('span', { class: 'info-s' }, sub) : null);
+}
+function decisao(s) {
+  if (s.status === 'PENDENTE') return info('Decisão', 'Aguardando o aprovador', null, true);
+  if (s.status === 'CANCELADA') { const h = s.historico[s.historico.length - 1]; return info('Decisão', 'Cancelada por ' + nomeDe(h.usuarioId), 'Em ' + fmtData(h.em)); }
+  return info('Decisão', (s.status === 'APROVADA' ? 'Aprovada' : 'Recusada') + ' por ' + nomeDe(s.aprovadorId), 'Em ' + fmtData(s.dtDecisao));
+}
+function equipamentoSol(s) {
+  if (s.equipamentoId) return info(s.status === 'APROVADA' ? 'Equipamento emprestado' : 'Equipamento', nomeEq(s.equipamentoId));
+  return info('Equipamento', s.status === 'PENDENTE' ? 'Definido na aprovação' : 'Nenhum', null, true);
+}
+function cartaoSol(s, { acoes, mostrarSolicitante }) {
+  const hist = el('details', { class: 'hist' }, el('summary', {}, el('span', { html: ic(I.seta, 14) }), 'Histórico (' + s.historico.length + ')'),
+    el('ol', { class: 'linha' }, ...s.historico.map((h) => el('li', {},
+      el('b', {}, h.de ? STATUS_SOL[h.de] + ' → ' + STATUS_SOL[h.para] : 'Solicitação criada'),
+      el('small', {}, nomeDe(h.usuarioId) + ' · ' + fmtData(h.em)), h.obs ? el('q', {}, h.obs) : null))));
+  return el('article', { class: 'sol' },
+    el('div', { class: 'sol-h' },
+      el('div', {},
+        el('div', { class: 'sol-t' }, el('span', { class: 'sol-id' }, '#' + s.id), tituloSol(s)),
+        el('p', { class: 'sol-d' }, s.descricao)),
+      el('div', { class: 'sol-lado' }, badgeSol(s.status))),
+    el('div', { class: 'info' },
+      mostrarSolicitante ? info('Solicitante', nomeDe(s.solicitanteId)) : null,
+      info('Solicitada em', fmtData(s.dtSolicitacao)),
+      equipamentoSol(s),
+      decisao(s)),
+    s.observacao && s.status !== 'PENDENTE' ? el('div', { class: 'sol-obs ' + s.status, style: 'margin-top:14px' }, el('small', {}, s.status === 'RECUSADA' ? 'Justificativa da recusa' : 'Observação do aprovador'), s.observacao) : null,
+    acoes ? el('div', { class: 'sol-acoes' }, ...acoes) : null,
+    hist);
+}
+
+function telaMinhas() {
+  const acao = el('button', { class: 'btn', onclick: () => ir('nova') }, el('span', { html: ic(I.mais, 16) }), 'Nova solicitação');
+  if (S.estado === 'carregando') return [cabecalhoPagina(acao), carregando('Carregando suas solicitações…'), esqueletoTabela(3)];
+  const minhas = S.estado === 'vazio' ? [] : SOLICITACOES.filter((s) => s.solicitanteId === usuario().id).slice().reverse();
+  if (!minhas.length) return [cabecalhoPagina(acao), el('div', { class: 'vazio' }, el('h3', {}, 'Você ainda não fez nenhuma solicitação.'),
+    'Descreva o equipamento de que você precisa, e o aprovador responde por aqui.', el('div', {}, el('button', { class: 'btn', onclick: () => ir('nova') }, 'Nova solicitação')))];
+  return [cabecalhoPagina(acao), el('div', { class: 'sols' }, ...minhas.map((s) => cartaoSol(s, {
+    acoes: s.status === 'PENDENTE' ? [el('button', { class: 'btn btn-sec btn-p', onclick: () => dialogoCancelar(s) }, 'Cancelar solicitação')] : null })))];
+}
+
+function dialogoCancelar(s) {
+  const fechar = () => { S.sobreposto = null; render(); };
+  const confirmar = el('button', { class: 'btn btn-perigo', onclick: () => aguardar(confirmar, 'Cancelando…', () => {
+    s.status = 'CANCELADA';
+    s.historico.push({ usuarioId: usuario().id, de: 'PENDENTE', para: 'CANCELADA', em: HOJE });
+    S.sobreposto = null; render(); toast('Solicitação #' + s.id + ' cancelada.');
+  }) }, 'Cancelar solicitação');
+  S.sobreposto = () => [el('div', { class: 'fundo', onclick: fechar }), el('div', { class: 'dialogo', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'd-t' },
+    el('div', { class: 'dialogo-h' }, el('h2', { id: 'd-t' }, 'Cancelar a solicitação #' + s.id + '?'), el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: fechar }, '×')),
+    el('div', { class: 'dialogo-b' }, el('p', { style: 'margin:0' }, 'O pedido de ', el('b', {}, tituloSol(s)), ' sai da fila do aprovador. Só é possível cancelar enquanto está pendente.')),
+    el('div', { class: 'dialogo-f' }, el('button', { class: 'btn btn-sec', onclick: fechar }, 'Voltar'), confirmar))];
+  render();
+}
+
+function telaNova() {
+  const tipo = el('input', { class: 'input', id: 's-tipo', placeholder: 'Ex.: notebook' });
+  const marca = el('input', { class: 'input', id: 's-marca', placeholder: 'Opcional' });
+  const modelo = el('input', { class: 'input', id: 's-modelo', placeholder: 'Opcional' });
+  const desc = el('textarea', { class: 'textarea', id: 's-desc', placeholder: 'Ex.: Notebook para um treinamento externo de 3 dias.' });
+  const cTipo = el('div', { class: 'campo', id: 'c-tipo' }, el('label', { for: 's-tipo' }, 'Tipo'), tipo,
+    el('p', { class: 'dica' }, 'O tipo de equipamento: notebook, monitor, celular…'), el('p', { class: 'erro-campo' }, 'Informe o tipo do equipamento.'));
+  const cDesc = el('div', { class: 'campo', id: 'c-desc' }, el('label', { for: 's-desc' }, 'Para que você precisa?'), desc, el('p', { class: 'erro-campo' }, 'Descreva o motivo do pedido.'));
+  const resumo = el('div', { class: 'alerta crit', role: 'alert', hidden: true }, el('span', { html: ic(I.alerta) }), el('div', {}, el('b', {}, 'Dados inválidos.'), 'Corrija os campos destacados.'));
+  const enviar = el('button', { class: 'btn', type: 'submit' }, 'Enviar solicitação');
+  const form = el('form', { class: 'form', novalidate: true, onsubmit: (ev) => {
+    ev.preventDefault();
+    const erros = { tipo: !tipo.value.trim(), desc: !desc.value.trim() };
+    for (const [k, v] of Object.entries(erros)) document.getElementById('c-' + k).classList.toggle('invalido', v);
+    const ok = !Object.values(erros).some(Boolean);
+    resumo.hidden = ok;
+    if (!ok) return;
+    aguardar(enviar, 'Enviando…', () => {
+      const id = Math.max(...SOLICITACOES.map((s) => s.id)) + 1;
+      const u = usuario();
+      SOLICITACOES.push({ id, solicitanteId: u.id, equipamentoId: null, descricao: desc.value.trim(), status: 'PENDENTE', dtSolicitacao: HOJE,
+        tipoSolicitado: tipo.value.trim().toLowerCase(), marcaSolicitada: marca.value.trim() || null, modeloSolicitado: modelo.value.trim() || null,
+        historico: [{ usuarioId: u.id, de: null, para: 'PENDENTE', em: HOJE }] });
+      ir('minhas'); toast('Solicitação #' + id + ' enviada ao aprovador.');
+    });
+  } },
+    resumo, cTipo,
+    el('div', { class: 'form-g' }, el('div', { class: 'campo' }, el('label', { for: 's-marca' }, 'Marca ', el('small', {}, '(opcional)')), marca),
+      el('div', { class: 'campo' }, el('label', { for: 's-modelo' }, 'Modelo ', el('small', {}, '(opcional)')), modelo)),
+    cDesc,
+    el('p', { class: 'dica' }, 'O aprovador escolhe qual equipamento entregar, conforme o estoque. Se não houver, ele recusa com uma justificativa.'),
+    el('div', { class: 'form-acoes' }, el('button', { class: 'btn btn-sec', type: 'button', onclick: () => ir('minhas') }, 'Cancelar'), enviar));
+  semSubmit(form);
+  return [cabecalhoPagina(), form];
+}
+
+function telaPendentes() {
+  if (S.estado === 'carregando') return [cabecalhoPagina(), carregando('Carregando solicitações pendentes…'), esqueletoTabela(2)];
+  const lista = S.estado === 'vazio' ? [] : SOLICITACOES.filter((s) => s.status === 'PENDENTE');
+  if (!lista.length) return [cabecalhoPagina(), el('div', { class: 'vazio' }, el('h3', {}, 'Nenhuma solicitação pendente.'), 'Quando um solicitante fizer um pedido, ele aparece aqui.')];
+  return [cabecalhoPagina(), el('div', { class: 'sols' }, ...lista.map((s) => cartaoSol(s, { mostrarSolicitante: true, acoes: [
+    el('button', { class: 'btn btn-p', onclick: () => dialogoDecisao(s, 'APROVADA') }, 'Aprovar'),
+    el('button', { class: 'btn btn-sec btn-p', onclick: () => dialogoDecisao(s, 'RECUSADA') }, 'Recusar')] })))];
+}
+
+function dialogoDecisao(s, decisao) {
+  const aprovar = decisao === 'APROVADA';
+  const fechar = () => { S.sobreposto = null; render(); };
+  // Todos os disponíveis, com os do tipo pedido primeiro: o tipo é texto livre e pode não coincidir.
+  const disponiveis = EQUIPAMENTOS.filter((e) => e.status === 'DISPONIVEL');
+  const doTipo = disponiveis.filter((e) => e.tipo === s.tipoSolicitado);
+  const outros = disponiveis.filter((e) => e.tipo !== s.tipoSolicitado);
+  const opcao = (e) => el('option', { value: e.id }, e.marca + ' ' + e.modelo + ' · ' + cap(e.tipo));
+  const sEquip = el('select', { class: 'select', id: 'd-equip' }, el('option', { value: '' }, 'Selecione…'),
+    doTipo.length ? el('optgroup', { label: 'Do tipo pedido (' + cap(s.tipoSolicitado) + ')' }, ...doTipo.map(opcao)) : null,
+    outros.length ? el('optgroup', { label: 'Outros tipos' }, ...outros.map(opcao)) : null);
+  const cEquip = disponiveis.length
+    ? el('div', { class: 'campo', id: 'c-d-equip' }, el('label', { for: 'd-equip' }, 'Equipamento a emprestar'), sEquip,
+      el('p', { class: 'dica' }, doTipo.length + ' do tipo ' + cap(s.tipoSolicitado) + ' entre os ' + disponiveis.length + ' disponíveis.'), el('p', { class: 'erro-campo' }, 'Escolha o equipamento para aprovar.'))
+    : el('div', { class: 'alerta info', id: 'c-d-equip' }, el('span', { html: ic(I.alerta) }),
+      el('div', {}, el('b', {}, 'Nenhum equipamento disponível.'), 'Não há como aprovar agora. Recuse com uma justificativa ou cadastre um equipamento.'));
+  const just = el('textarea', { class: 'textarea', id: 'd-just', placeholder: aprovar ? 'Opcional. Ex.: Retirar com a equipe de suporte.' : 'Ex.: Não há equipamento compatível no estoque.' });
+  const cJust = el('div', { class: 'campo', id: 'c-d-just' }, el('label', { for: 'd-just' }, aprovar ? 'Observação ' : 'Justificativa', aprovar ? el('small', {}, '(opcional)') : null), just,
+    el('p', { class: 'erro-campo' }, 'A justificativa é obrigatória na recusa.'));
+  // A tela mostra a mensagem da API: o 409 tem duas causas, e só a API sabe qual aconteceu.
+  const msgConflito = el('div', {});
+  const conflito = el('div', { class: 'alerta crit', role: 'alert', hidden: true }, el('span', { html: ic(I.alerta) }), msgConflito);
+  const confirmar = el('button', { class: 'btn' + (aprovar ? '' : ' btn-perigo'), onclick: () => {
+    const erroEquip = aprovar && !sEquip.value, erroJust = !aprovar && !just.value.trim();
+    cEquip.classList.toggle('invalido', erroEquip); cJust.classList.toggle('invalido', erroJust);
+    if (erroEquip || erroJust) return;
+    aguardar(confirmar, aprovar ? 'Aprovando…' : 'Recusando…', () => {
+      if (S.estado === 'conflito') {
+        // Simulação: na aprovação, outro aprovador entregou o equipamento; na recusa, decidiu a solicitação.
+        const resposta = { status: 409, erro: aprovar ? 'O equipamento escolhido já não está disponível.' : 'A solicitação já não está pendente.' };
+        msgConflito.replaceChildren(el('b', {}, 'Não foi possível concluir.'), resposta.erro);
+        conflito.hidden = false; confirmar.disabled = true; return;
+      }
+      const u = usuario();
+      if (aprovar) {
+        s.equipamentoId = Number(sEquip.value);
+        eqDe(s.equipamentoId).status = 'EMPRESTADO';
+      }
+      Object.assign(s, { status: decisao, observacao: just.value.trim() || null, dtDecisao: HOJE, aprovadorId: u.id });
+      s.historico.push({ usuarioId: u.id, de: 'PENDENTE', para: decisao, em: HOJE, obs: just.value.trim() || null });
+      S.sobreposto = null; render();
+      toast('Solicitação #' + s.id + (aprovar ? ' aprovada. ' + nomeEq(s.equipamentoId) + ' emprestado para ' + nomeDe(s.solicitanteId) + '.' : ' recusada.'));
+    });
+  } }, aprovar ? 'Aprovar' : 'Recusar');
+  confirmar.disabled = aprovar && !disponiveis.length;
+  S.sobreposto = () => [el('div', { class: 'fundo', onclick: fechar }), el('div', { class: 'dialogo', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'd-t' },
+    el('div', { class: 'dialogo-h' }, el('h2', { id: 'd-t' }, (aprovar ? 'Aprovar' : 'Recusar') + ' a solicitação #' + s.id), el('button', { class: 'fechar', 'aria-label': 'Fechar', onclick: fechar }, '×')),
+    el('div', { class: 'dialogo-b' }, conflito,
+      el('div', { class: 'ficha' }, info('Pedido', tituloSol(s), s.descricao), info('Solicitante', nomeDe(s.solicitanteId)), info('Solicitada em', fmtData(s.dtSolicitacao))),
+      aprovar ? cEquip : null, cJust),
+    el('div', { class: 'dialogo-f' }, el('button', { class: 'btn btn-sec', onclick: fechar }, 'Voltar'), confirmar))];
+  render();
+  (document.getElementById('d-equip') || document.getElementById('d-just')).focus();
+}
+
+// ===== Controles do protótipo =====
+document.getElementById('p-tela').addEventListener('change', (e) => ir(e.target.value));
+for (const b of document.querySelectorAll('#p-perfil button')) b.addEventListener('click', () => {
+  S.perfil = b.dataset.v;
+  if (S.tela === 'login') S.tela = inicio();
+  render();
+});
+for (const b of document.querySelectorAll('#p-estado button')) b.addEventListener('click', () => { S.estado = b.dataset.v; render(); });
+for (const b of document.querySelectorAll('#p-tema button')) b.addEventListener('click', () => trocarTema(b.dataset.v));
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.sobreposto) { S.sobreposto = null; render(); } });
+document.addEventListener('click', (e) => {
+  const um = document.querySelector('.um');
+  if (um && !um.hidden && !e.target.closest('.usuario')) { um.hidden = true; document.querySelector('.usuario-b').setAttribute('aria-expanded', 'false'); }
+});
+window.addEventListener('resize', () => document.documentElement.style.setProperty('--proto-h', document.getElementById('proto').offsetHeight + 'px'));
+render();
+</script>
+</body>
+</html>

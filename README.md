@@ -92,6 +92,7 @@ entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS
 | Planejamento e documentação | Revisou a especificação, apontou lacunas e alternativas, e redigiu os documentos a partir das decisões | As decisões, os alinhamentos com a equipe e a revisão dos textos |
 | Banco e infraestrutura | Propôs o schema com os índices, o seed, os Dockerfiles e o compose, e explicou cada escolha | A implementação, a correção dos erros que apareceram no boot e a conferência com o sistema rodando |
 | Base da API e login | Comparou as formas de guardar o token, propôs o formato de erro, a validação e o login, e montou os testes de cada caminho de erro | A escolha do cookie, a implementação, a revisão dos comentários e a conferência fora do Docker e com o sistema rodando |
+| Protótipo das telas | Analisou o protótipo contra a especificação e as decisões, e aplicou as mudanças decididas na revisão | A primeira versão, as regras de cada tela (como a de o solicitante não ver o estoque) e a conferência nos dois perfis |
 
 Cada etapa acrescenta a sua linha nesta tabela.
 
@@ -117,6 +118,7 @@ Cada etapa acrescenta a sua linha nesta tabela.
 | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) | Como o sistema funciona por dentro e onde ele roda |
 | [`docs/API.md`](docs/API.md) | As rotas da API: entrada, resposta e erros |
 | [`docs/PAGES.md`](docs/PAGES.md) | As telas e o estado de cada uma |
+| [`docs/prototipo/`](docs/prototipo/) | O protótipo navegável das telas, com dados fictícios |
 | [`docs/PITFALLS.md`](docs/PITFALLS.md) | Falhas silenciosas que já aconteceram, com sintoma e conferência |
 
 ---
