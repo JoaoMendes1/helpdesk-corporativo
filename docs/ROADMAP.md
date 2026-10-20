@@ -2,15 +2,15 @@
 
 As etapas do teste técnico, o que já está pronto e o que vem depois.
 
-## Status (18/10/2026)
+## Status (20/10/2026)
 
 | Etapa | Status |
 |---|---|
 | 1 · Repositório e documentação | ✅ Concluída |
 | 2 · Banco e infraestrutura | ✅ Concluída |
 | 3 · Base da API e login | ✅ Concluída |
-| 4 · Equipamentos e dashboard | 🚧 Próxima |
-| 5 · Solicitações | 🕐 Planejada |
+| 4 · Equipamentos e dashboard | ✅ Concluída |
+| 5 · Solicitações | 🚧 Próxima |
 | 6 · Frontend: login, equipamentos e dashboard | 🕐 Planejada |
 | 7 · Frontend: solicitações e aprovação | 🕐 Planejada |
 | 8 · Entrega | 🕐 Planejada |
@@ -60,37 +60,43 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] Login exigido em toda a `/api`, menos nas rotas de login e de saúde (`/api/health`)
 - [x] Middleware que exige um perfil (aprovador ou solicitante)
 
-## Etapa 4: Equipamentos e dashboard
+## Etapa 4: Equipamentos e dashboard (#3)
 
-- [ ] `POST /api/novo-equipamento`, só para o aprovador
-- [ ] `GET /api/equipamentos`, com filtros por `status` e `tipo`
-- [ ] `GET /api/equipamento/:id`, com quem cadastrou e o empréstimo atual
-- [ ] Rota do dashboard: totais de equipamentos por status
+- [x] `POST /api/novo-equipamento`, com o tipo gravado em minúsculas
+- [x] `GET /api/equipamentos`, com filtros por `status` e `tipo`
+- [x] `GET /api/equipamento/:id`, com quem cadastrou e o empréstimo atual
+- [x] `GET /api/equipamentos/totais`: totais de equipamentos por status, para o dashboard
+- [x] As quatro rotas só para o aprovador: o solicitante não vê o estoque
+- [x] Validação também da query e do `:id`, com o resultado em `req.validado`
 
 ## Etapa 5: Solicitações
 
-- [ ] Solicitante: criar solicitação, com um equipamento escolhido ou a descrição do que
-      precisa; listar as próprias; cancelar enquanto `PENDENTE`
+- [ ] Solicitante: criar solicitação pela descrição do que precisa (tipo e descrição
+      obrigatórios; marca e modelo opcionais); listar as próprias; cancelar enquanto
+      `PENDENTE`
 - [ ] Criar solicitação só com o perfil solicitante
 - [ ] Solicitação de outro usuário responde `404`
-- [ ] Aprovador: listar as pendentes, aprovar e recusar, com justificativa obrigatória na
-      recusa
+- [ ] Aprovador: listar as pendentes, aprovar escolhendo o equipamento e recusar, com
+      justificativa obrigatória na recusa
 - [ ] Aprovação e recusa numa transação, com `409` se o estado mudou
 - [ ] Histórico de cada solicitação, gravado desde a criação e visível só para o dono e para
       os aprovadores
+- [ ] Seed coerente com a regra: as solicitações #1 e #4 como pedidos descritos, e a data de
+      cadastro dos equipamentos anterior à das solicitações
 
 ## Etapa 6: Frontend: login, equipamentos e dashboard
 
 - [x] Decidir onde o token fica guardado: cookie `httpOnly`, decidido antes, porque a
       etapa 3 já dependia da resposta
-- [ ] Tela de login
-- [ ] Lista de equipamentos com filtros, e cadastro só para o aprovador
-- [ ] Dashboard com os totais por status
+- [ ] Tela de login, levando o solicitante direto às suas solicitações
+- [ ] Lista de equipamentos com filtros e cadastro, só para o aprovador
+- [ ] Dashboard do aprovador com os totais por status
 - [ ] Estados de carregamento e erro em todas as telas, e de validação nas que têm formulário
 
 ## Etapa 7: Frontend: solicitações e aprovação
 
-- [ ] Solicitante: nova solicitação e minhas solicitações, com status e histórico
+- [ ] Solicitante: nova solicitação, pela descrição, e minhas solicitações, com status e
+      histórico
 - [ ] Aprovador: solicitações pendentes, com aprovar e recusar
 - [ ] Estados de carregamento, erro e validação
 
@@ -124,6 +130,12 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   não pede; decidir na etapa 5, conforme o tempo.
 
 ## Manutenção
+
+### 20/10/2026: equipamentos e totais por status (#3)
+
+As três rotas obrigatórias e os totais, só para o aprovador, com validação do corpo, da query
+e do `:id`. Conferidas fora do Docker, inclusive nos caminhos de erro, e com `docker compose
+up` do zero e os dados do seed.
 
 ### 18/10/2026: base da API e login (#2)
 

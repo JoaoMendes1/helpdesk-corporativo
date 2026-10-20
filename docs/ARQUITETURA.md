@@ -42,9 +42,9 @@ rota ──> middlewares ──> controller ──> service ──> Prisma ─�
 | Pasta em `backend/src/` | O que fica nela |
 |---|---|
 | `routes/` | Liga cada URL aos middlewares e ao controller. Não tem regra nenhuma |
-| `middlewares/` | `autenticar` (exige login), `exigirPerfil` (exige o perfil da rota), `validar` (confere a entrada com um schema) e `tratarErros` (transforma qualquer erro na resposta padronizada) |
+| `middlewares/` | `autenticar` (exige login), `exigirPerfil` (exige o perfil da rota), `validar` (confere o corpo, a query ou os parâmetros com um schema e guarda o resultado em `req.validado`) e `tratarErros` (transforma qualquer erro na resposta padronizada) |
 | `schemas/` | Os schemas do `zod` que descrevem a entrada de cada rota |
-| `controllers/` | Lê a requisição (parâmetros, corpo, usuário do token) e monta a resposta HTTP |
+| `controllers/` | Lê os dados validados (`req.validado`) e o usuário do token (`req.usuario`), e monta a resposta HTTP. Não lê `req.body`, `req.query` nem `req.params` direto. No Express 5, `req.query` nem aceita atribuição: o valor novo é descartado sem erro |
 | `services/` | A regra de negócio. É a única camada que fala com o Prisma |
 | `errors/` | O `ErroApp`: o erro previsto pela aplicação, com o status HTTP e, no `400`, os erros por campo |
 | `config/` | Leitura das variáveis de ambiente. Variável obrigatória faltando derruba o boot |
@@ -92,8 +92,12 @@ express.json → cookie-parser → /api/health → rotas de autenticação → a
   regras vêm sempre daí, nunca do corpo, da URL ou da query string.** O middleware não
   consulta o banco: um usuário desativado mantém o acesso até o token vencer.
 - Todas as rotas da `/api` exigem login, menos a de login e a de saúde (`/api/health`).
-- As rotas de cadastro de equipamento e de decisão sobre solicitação exigem também o perfil
-  `APROVADOR`. A de criar solicitação exige o perfil `SOLICITANTE`.
+- As rotas de equipamentos (cadastro, lista, detalhe e totais) e as de decisão sobre
+  solicitação exigem também o perfil `APROVADOR`; a de criar solicitação, o perfil
+  `SOLICITANTE`.
+- O perfil é exigido em cada rota, nunca com `router.use`. Num router montado em `/api`, o
+  `router.use` vale para toda requisição que passa por ele: o solicitante receberia `403` nas
+  rotas de outros routers e até em rotas inexistentes.
 
 ## Banco
 

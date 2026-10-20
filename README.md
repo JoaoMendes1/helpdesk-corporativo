@@ -16,20 +16,20 @@ equipamentos e decide cada pedido, com justificativa.
 | MySQL com índices de acordo com os filtros usados | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
 | Projeto inteiro sobe com `docker compose up` | ✅ Pronto | [Como rodar](#como-rodar) |
 | Perfis de solicitante e de aprovador, com a regra crítica | 🚧 Em andamento | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
-| `POST /api/novo-equipamento`, `GET /api/equipamentos` e `GET /api/equipamento/:id` | 🕐 Planejado | [`docs/API.md`](docs/API.md) |
+| `POST /api/novo-equipamento`, `GET /api/equipamentos` e `GET /api/equipamento/:id` | ✅ Pronto | [`docs/API.md`](docs/API.md) |
 | Erros padronizados (`400`, `404`, `409`, `422`) | 🚧 Em andamento | [`docs/API.md`](docs/API.md) |
 | Variáveis de ambiente e `.env.example` sem senhas | ✅ Pronto | [`.env.example`](.env.example) |
 | Migrations e seed no primeiro boot, com histórico | ✅ Pronto | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
-| Dashboard com os totais de equipamentos por status | 🕐 Planejado | [`docs/PAGES.md`](docs/PAGES.md) |
+| Dashboard com os totais de equipamentos por status | 🚧 Em andamento | [`docs/PAGES.md`](docs/PAGES.md) |
 | `README.md` com o passo a passo e o uso de IA | 🚧 Em andamento | Este arquivo |
 | `DECISOES.md` com as decisões e os padrões de projeto | 🚧 Em andamento | [`DECISOES.md`](DECISOES.md) |
 | Diferencial: login com JWT | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
 
 ## Como rodar
 
-**Estado atual:** o `docker compose up` sobe o banco já com os dados de teste, a API (por
-enquanto, o login e a rota de saúde) e a página padrão do Vite. As rotas de equipamentos e as
-telas entram nas próximas etapas.
+**Estado atual:** o `docker compose up` sobe o banco já com os dados de teste, a API (login,
+rota de saúde e rotas de equipamentos) e a página padrão do Vite. As rotas de solicitações e
+as telas entram nas próximas etapas.
 
 **Pré-requisitos:** Git e Docker com o Compose (no Windows e no macOS, o Docker Desktop).
 

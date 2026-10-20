@@ -4,6 +4,7 @@ const ErroApp = require('./errors/ErroApp')
 const autenticar = require('./middlewares/autenticar')
 const tratarErros = require('./middlewares/tratarErros')
 const autenticacaoRoutes = require('./routes/autenticacaoRoutes')
+const equipamentoRoutes = require('./routes/equipamentoRoutes')
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use('/api', autenticacaoRoutes)
 
 // Toda rota registrada a partir daqui exige login.
 app.use('/api', autenticar)
+app.use('/api', equipamentoRoutes)
 
 // Requisição que nenhuma rota atendeu.
 app.use((req, res, next) => {

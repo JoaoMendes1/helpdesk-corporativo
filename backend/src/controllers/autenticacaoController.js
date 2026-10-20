@@ -11,7 +11,8 @@ const opcoesCookie = {
 }
 
 async function login(req, res) {
-    const { usuario, token } = await autenticacaoService.login(req.body.email, req.body.senha)
+    const { email, senha } = req.validado.body
+    const { usuario, token } = await autenticacaoService.login(email, senha)
 
     res.cookie(NOME_COOKIE, token, { ...opcoesCookie, maxAge: DURACAO_SEGUNDOS * 1000 })
     res.json({ usuario })

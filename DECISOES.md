@@ -5,7 +5,7 @@ arquivo reúne as escolhas que ela deixa em aberto, com o motivo e o custo aceit
 são minhas; a coluna **Alinhada com a equipe** marca as que confirmei com a equipe responsável
 pelo teste antes de implementar. As versões seguem as linhas que essa equipe usa.
 
-Registradas em 17/10/2026 · atualizadas em 18/10/2026.
+Registradas em 17/10/2026 · atualizadas em 20/10/2026.
 
 ## Padrões de projeto
 
@@ -53,7 +53,7 @@ Registradas em 17/10/2026 · atualizadas em 18/10/2026.
 |---|---|---|---|
 | Status escolhido no cadastro, com `DISPONIVEL` como padrão | Sim | A especificação diz que a rota cria com `DISPONIVEL`, mas também que o aprovador informa o status | Dá para cadastrar um equipamento já `EMPRESTADO`, sem solicitação ligada |
 | Data de cadastro automática | Sim | O banco já preenche a data, e uma data digitada abriria espaço para erro | Não dá para registrar data retroativa |
-| Equipamento escolhido pelo solicitante ou na aprovação | Não | O modelo prevê os dois caminhos: `equipamentoId` opcional e os campos `marcaSolicitada`, `modeloSolicitado` e `tipoSolicitado`. Se o solicitante só descreveu, o aprovador escolhe ao aprovar | Escolher não reserva: se o equipamento sair antes, a aprovação recebe `409` |
+| O solicitante não vê o estoque: pede pela descrição, e o aprovador escolhe o equipamento ao aprovar | Não | Segue o fluxo real de gestão de ativos: quem pede descreve a necessidade, e quem cuida do estoque decide qual unidade entregar. O modelo já prevê o pedido descrito (`marcaSolicitada`, `modeloSolicitado`, `tipoSolicitado`). As rotas de equipamentos e os totais ficam só para o aprovador | O solicitante não sabe se há equipamento antes de pedir, e um pedido sem estoque termina em recusa, com justificativa |
 | Aprovação e recusa numa transação, com condição | Não | Solicitação, equipamento e histórico mudam juntos, e só se a solicitação ainda estiver `PENDENTE` e o equipamento `DISPONIVEL`. Assim nada é emprestado ou decidido duas vezes | Quem perde a disputa recebe `409` |
 | Justificativa obrigatória na recusa | Não | A especificação pede o registro das "justificativas cabíveis". Na recusa, o solicitante precisa saber o motivo; na aprovação, é opcional | Recusar sem justificativa recebe `400` |
 | Cancelamento só pelo dono, e só enquanto `PENDENTE` | Não | Depois da decisão do aprovador, cancelar desfaria uma decisão que não é do solicitante | Solicitação aprovada por engano só muda com uma regra nova |

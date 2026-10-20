@@ -4,8 +4,8 @@ Rotas da API, com o formato de entrada, de resposta e de erro. Quem usa é o fro
 mesmo endereço, em `/api`, e quem avalia o projeto, com um cliente HTTP.
 
 **Estado:** 🚧 em andamento. As rotas de autenticação e o formato de erro existem desde a
-etapa 3. As de equipamentos e do dashboard entram na etapa 4, e as de solicitações, na etapa 5
-do [`ROADMAP.md`](ROADMAP.md).
+etapa 3, e as de equipamentos, desde a etapa 4. As de solicitações entram na etapa 5 do
+[`ROADMAP.md`](ROADMAP.md).
 
 ## Autenticação
 
@@ -57,70 +57,96 @@ uma cópia dele vale até expirar, como registrado no [`DECISOES.md`](../DECISOE
 Responde `200` com `{ "status": "ok" }` quando a API está no ar. É a rota que o `healthcheck`
 do compose usa, e não exige login.
 
-## Rotas obrigatórias
+## Rotas de equipamentos
+
+**Só o perfil `APROVADOR`.** O solicitante não vê o estoque: pede pela descrição do que
+precisa, e o aprovador escolhe o equipamento ao aprovar. O motivo está no
+[`DECISOES.md`](../DECISOES.md). Para o solicitante, as quatro rotas respondem `403`.
+
+As três primeiras são as rotas obrigatórias da especificação, com os nomes exatos dela. A
+quarta atende ao dashboard.
 
 ### `POST /api/novo-equipamento`
 
-Cadastra um equipamento. **Só o perfil `APROVADOR`.**
+Cadastra um equipamento.
 
 | Campo do corpo | Tipo | Obrigatório? | O que é |
 |---|---|---|---|
-| `marca` | texto | sim | |
-| `modelo` | texto | sim | |
-| `tipo` | texto | sim | Ex.: notebook, monitor |
+| `marca` | texto | sim | Até 191 caracteres. Espaços nas pontas são removidos |
+| `modelo` | texto | sim | Até 191 caracteres. Espaços nas pontas são removidos |
+| `tipo` | texto | sim | Ex.: notebook, monitor. Até 191 caracteres, gravado em minúsculas: "Notebook" e "notebook" são o mesmo tipo nos filtros |
 | `status` | texto | não | Um de `DISPONIVEL`, `EMPRESTADO`, `MANUTENCAO` ou `INATIVO`. Se não vier, `DISPONIVEL` |
 
-A data de cadastro é preenchida pelo banco, e o criador vem do token. Resposta: `201`, com o
-equipamento criado.
+A data de cadastro é preenchida pelo banco, e o criador vem do token: um `criadoPorId` no
+corpo é ignorado. Resposta: `201`, com o equipamento criado; `400` com os erros por campo.
 
 ```json
 {
-  "id": 1,
+  "id": 11,
   "marca": "Dell",
-  "modelo": "Latitude 5440",
+  "modelo": "XPS 13",
   "tipo": "notebook",
   "status": "DISPONIVEL",
-  "dtCadastro": "2026-10-17T13:00:00.000Z",
+  "dtCadastro": "2026-10-20T13:00:00.000Z",
   "criadoPorId": 1
 }
 ```
 
 ### `GET /api/equipamentos`
 
-Lista os equipamentos. Filtros pela query string, todos opcionais:
+Lista os equipamentos, em ordem de id e sem paginação. Filtros pela query string, todos
+opcionais:
 
 | Parâmetro | O que filtra |
 |---|---|
-| `status` | Um dos quatro status do equipamento |
-| `tipo` | O tipo do equipamento |
+| `status` | Um dos quatro status do equipamento. Outro valor responde `400` |
+| `tipo` | O tipo do equipamento, sem diferenciar maiúsculas. Vazio é ignorado |
 
-Resposta: `200`, com a lista no mesmo formato do equipamento acima.
+Exemplo: `/api/equipamentos?status=DISPONIVEL&tipo=monitor`.
+
+Resposta: `200`, com a lista no mesmo formato do equipamento acima. Sem resultado, a lista
+vem vazia.
 
 ### `GET /api/equipamento/:id`
 
-Os dados detalhados de um equipamento: os mesmos campos da lista, mais quem o cadastrou e,
-se estiver emprestado, a solicitação aprovada que o emprestou.
+Os dados detalhados de um equipamento: os campos da lista, com quem o cadastrou no lugar do
+`criadoPorId`, e o empréstimo atual.
 
-Resposta: `200`; `400` se o id não for um número; `404` se não existir.
+Resposta: `200`; `400` se o id não for um número inteiro de 1 a 2147483647, o maior valor da
+coluna; `404` se não existir.
 
 ```json
 {
   "id": 1,
-  "marca": "Dell",
-  "modelo": "Latitude 5440",
+  "marca": "Lenovo",
+  "modelo": "ThinkPad E14",
   "tipo": "notebook",
   "status": "EMPRESTADO",
-  "dtCadastro": "2026-10-17T13:00:00.000Z",
+  "dtCadastro": "2026-10-01T13:00:00.000Z",
   "criadoPor": { "id": 1, "nome": "Ana Souza" },
   "emprestimoAtual": {
-    "solicitacaoId": 7,
-    "solicitante": { "id": 3, "nome": "Bruno Lima" },
-    "dtDecisao": "2026-10-18T09:30:00.000Z"
+    "solicitacaoId": 1,
+    "solicitante": { "id": 2, "nome": "Bruno Lima" },
+    "dtDecisao": "2026-10-10T09:30:00.000Z"
   }
 }
 ```
 
-Quando o equipamento não está emprestado, `emprestimoAtual` vem `null`.
+`emprestimoAtual` é a solicitação aprovada mais recente do equipamento. Vem `null` quando o
+equipamento não está emprestado, ou quando foi cadastrado já como `EMPRESTADO`, sem
+solicitação ligada.
+
+### `GET /api/equipamentos/totais`
+
+Os totais de equipamentos por status, para o dashboard. Traz sempre os quatro status,
+inclusive os que têm zero. Resposta: `200`.
+
+```json
+{
+  "total": 10,
+  "porStatus": { "DISPONIVEL": 6, "EMPRESTADO": 1, "MANUTENCAO": 2, "INATIVO": 1 }
+}
+```
 
 ## Erros
 
@@ -142,9 +168,9 @@ O critério de cada status está no [`DECISOES.md`](../DECISOES.md).
 
 | Código | Quando |
 |---|---|
-| `400` | Corpo ou parâmetros fora do formato: JSON malformado, campo obrigatório faltando (inclusive a justificativa da recusa), tipo errado, id que não é número |
+| `400` | Corpo ou parâmetros fora do formato: JSON malformado, campo obrigatório faltando (inclusive a justificativa da recusa), tipo errado, texto acima de 191 caracteres, id que não é número, filtro de `status` desconhecido |
 | `401` | Sem login, ou com token inválido ou expirado; e-mail ou senha errados; usuário inativo |
-| `403` | Perfil sem permissão para a rota: solicitante cadastrando equipamento, aprovador criando solicitação |
+| `403` | Perfil sem permissão para a rota: solicitante nas rotas de equipamentos, aprovador criando solicitação |
 | `404` | Recurso ou rota não encontrados, inclusive solicitação de outro usuário |
 | `409` | O estado mudou: solicitação que já não está `PENDENTE`, equipamento que já não está `DISPONIVEL` |
 | `422` | Formato certo, mas a regra não aceita: aprovar sem informar o equipamento quando a solicitação não tem um |
