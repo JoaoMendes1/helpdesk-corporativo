@@ -414,7 +414,7 @@ const USUARIOS = [
   { id: 4, nome: 'Ronaldo Souza', email: 'inativo@example.com', perfil: 'SOLICITANTE', ativo: false },
 ];
 const SENHA = 'Senha@123';
-const CADASTRO = dias(2);
+const CADASTRO = dias(30);
 const EQUIPAMENTOS = [
   { id: 1, marca: 'Lenovo', modelo: 'ThinkPad E14', tipo: 'notebook', status: 'EMPRESTADO' },
   { id: 2, marca: 'Dell', modelo: 'Latitude 5440', tipo: 'notebook', status: 'DISPONIVEL' },
@@ -435,7 +435,7 @@ const SOLICITACOES = [
     status: 'RECUSADA', observacao: 'Não há MacBook no estoque; o notebook padrão atende ao uso.', dtSolicitacao: dias(6), dtDecisao: dias(5), aprovadorId: 1,
     historico: [{ usuarioId: 2, de: null, para: 'PENDENTE', em: dias(6) }, { usuarioId: 1, de: 'PENDENTE', para: 'RECUSADA', em: dias(5), obs: 'Não há MacBook no estoque; o notebook padrão atende ao uso.' }] },
   { id: 3, solicitanteId: 3, equipamentoId: null, descricao: 'Kit de teclado e mouse.', tipoSolicitado: 'teclado e mouse', status: 'CANCELADA', dtSolicitacao: dias(4),
-    historico: [{ usuarioId: 3, de: null, para: 'PENDENTE', em: dias(4) }, { usuarioId: 3, de: 'PENDENTE', para: 'CANCELADA', em: dias(3), obs: 'Consegui um kit emprestado com a equipe.' }] },
+    historico: [{ usuarioId: 3, de: null, para: 'PENDENTE', em: dias(4) }, { usuarioId: 3, de: 'PENDENTE', para: 'CANCELADA', em: dias(3) }] },
   { id: 4, solicitanteId: 3, equipamentoId: null, descricao: 'Notebook para um treinamento externo.', tipoSolicitado: 'notebook', status: 'PENDENTE', dtSolicitacao: dias(2),
     historico: [{ usuarioId: 3, de: null, para: 'PENDENTE', em: dias(2) }] },
   { id: 5, solicitanteId: 2, equipamentoId: null, descricao: 'Monitor extra para a mesa.', tipoSolicitado: 'monitor', status: 'PENDENTE', dtSolicitacao: dias(1),

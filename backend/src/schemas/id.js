@@ -12,4 +12,4 @@ const schemaId = z.object({
         .refine((id) => id >= 1 && id <= MAIOR_ID, { error: 'Informe um id válido.' }),
 })
 
-module.exports = { schemaId }
+module.exports = { schemaId, MAIOR_ID }

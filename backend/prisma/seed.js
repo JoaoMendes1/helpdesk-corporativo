@@ -19,47 +19,49 @@ async function main() {
 
     const senha = await bcrypt.hash(SENHA_DE_TESTE, 10)
 
+    // Usuários e equipamentos cadastrados antes de todas as solicitações.
+    const cadastro = diasAtras(30)
+
     // Se falhar próximo boot tenta novamente
     await prisma.$transaction(async (tx) => {
         const ana = await tx.usuario.create({
-            data: { nome: 'Ana Souza', email: 'aprovador@example.com', senha, perfil: 'APROVADOR' },
+            data: { nome: 'Ana Souza', email: 'aprovador@example.com', senha, perfil: 'APROVADOR', dtCadastro: cadastro },
         })
         const bruno = await tx.usuario.create({
-            data: { nome: 'Bruno Lima', email: 'solicitante@example.com', senha },
+            data: { nome: 'Bruno Lima', email: 'solicitante@example.com', senha, dtCadastro: cadastro },
         })
         const cristina = await tx.usuario.create({
-            data: { nome: 'Cristina Rocha', email: 'cristina@example.com', senha },
+            data: { nome: 'Cristina Rocha', email: 'cristina@example.com', senha, dtCadastro: cadastro },
         })
         await tx.usuario.create({
-            data: { nome: 'Ronaldo Souza', email: 'inativo@example.com', senha, ativo: false }
+            data: { nome: 'Ronaldo Souza', email: 'inativo@example.com', senha, ativo: false, dtCadastro: cadastro }
         })
 
-        // Os dois equipamentos usados nas solicitações abaixo são criados um a um, para obter o id.
+        // O equipamento emprestado na solicitação aprovada é criado à parte, para obter o id.
         const thinkpad = await tx.equipamento.create({
-            data: { marca: 'Lenovo', modelo: 'ThinkPad E14', tipo: 'notebook', status: 'EMPRESTADO', criadoPorId: ana.id },
-        })
-        const latitude = await tx.equipamento.create({
-            data: { marca: 'Dell', modelo: 'Latitude 5440', tipo: 'notebook', criadoPorId: ana.id },
+            data: { marca: 'Lenovo', modelo: 'ThinkPad E14', tipo: 'notebook', status: 'EMPRESTADO', criadoPorId: ana.id, dtCadastro: cadastro },
         })
         await tx.equipamento.createMany({
             data: [
-                { marca: 'HP', modelo: 'EliteBook 840', tipo: 'notebook', status: 'MANUTENCAO', criadoPorId: ana.id },
-                { marca: 'Dell', modelo: 'P2422H', tipo: 'monitor', criadoPorId: ana.id },
-                { marca: 'LG', modelo: '24MK430H', tipo: 'monitor', criadoPorId: ana.id },
-                { marca: 'Logitech', modelo: 'MK270', tipo: 'teclado e mouse', criadoPorId: ana.id },
-                { marca: 'Samsung', modelo: 'Galaxy A15', tipo: 'celular', criadoPorId: ana.id },
-                { marca: 'Apple', modelo: 'iPad 10', tipo: 'tablet', status: 'INATIVO', criadoPorId: ana.id },
-                { marca: 'Epson', modelo: 'L3250', tipo: 'impressora', status: 'MANUTENCAO', criadoPorId: ana.id },
-                { marca: 'Dell', modelo: 'OptiPlex 7010', tipo: 'desktop', criadoPorId: ana.id },
+                { marca: 'Dell', modelo: 'Latitude 5440', tipo: 'notebook', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'HP', modelo: 'EliteBook 840', tipo: 'notebook', status: 'MANUTENCAO', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'Dell', modelo: 'P2422H', tipo: 'monitor', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'LG', modelo: '24MK430H', tipo: 'monitor', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'Logitech', modelo: 'MK270', tipo: 'teclado e mouse', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'Samsung', modelo: 'Galaxy A15', tipo: 'celular', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'Apple', modelo: 'iPad 10', tipo: 'tablet', status: 'INATIVO', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'Epson', modelo: 'L3250', tipo: 'impressora', status: 'MANUTENCAO', criadoPorId: ana.id, dtCadastro: cadastro },
+                { marca: 'Dell', modelo: 'OptiPlex 7010', tipo: 'desktop', criadoPorId: ana.id, dtCadastro: cadastro },
             ],
         })
 
-        // Aprovada: o solicitante escolheu o equipamento, que agora está emprestado.
+        // Aprovada: o aprovador escolheu o equipamento, que agora está emprestado.
         await tx.solicitacao.create({
             data: {
                 solicitanteId: bruno.id,
                 equipamentoId: thinkpad.id,
                 descricao: 'Notebook para o trabalho remoto.',
+                tipoSolicitado: 'notebook',
                 status: 'APROVADA',
                 observacao: 'Liberado para o home office.',
                 dtSolicitacao: diasAtras(10),
@@ -122,7 +124,6 @@ async function main() {
                             usuarioId: cristina.id,
                             statusAnterior: 'PENDENTE',
                             statusNovo: 'CANCELADA',
-                            observacao: 'Consegui um kit emprestado com a equipe.',
                             dtRegistro: diasAtras(3),
                         },
                     ],
@@ -130,12 +131,12 @@ async function main() {
             },
         })
 
-        // Duas pendentes, uma para cada caminho da aprovação: com o equipamento escolhido e sem.
+        // Duas pendentes, uma de cada solicitante.
         await tx.solicitacao.create({
             data: {
                 solicitanteId: cristina.id,
-                equipamentoId: latitude.id,
                 descricao: 'Notebook para um treinamento externo.',
+                tipoSolicitado: 'notebook',
                 dtSolicitacao: diasAtras(2),
                 historicos: {
                     create: [{ usuarioId: cristina.id, statusNovo: 'PENDENTE', dtRegistro: diasAtras(2) }],

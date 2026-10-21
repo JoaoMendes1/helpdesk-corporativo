@@ -2,7 +2,7 @@
 
 As etapas do teste técnico, o que já está pronto e o que vem depois.
 
-## Status (20/10/2026)
+## Status (21/10/2026)
 
 | Etapa | Status |
 |---|---|
@@ -10,8 +10,8 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 2 · Banco e infraestrutura | ✅ Concluída |
 | 3 · Base da API e login | ✅ Concluída |
 | 4 · Equipamentos e dashboard | ✅ Concluída |
-| 5 · Solicitações | 🚧 Próxima |
-| 6 · Frontend: login, equipamentos e dashboard | 🕐 Planejada |
+| 5 · Solicitações | ✅ Concluída |
+| 6 · Frontend: login, equipamentos e dashboard | 🚧 Próxima |
 | 7 · Frontend: solicitações e aprovação | 🕐 Planejada |
 | 8 · Entrega | 🕐 Planejada |
 | 9 · Depois da entrega (`optional`) | 🕐 Planejada |
@@ -69,20 +69,20 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] As quatro rotas só para o aprovador: o solicitante não vê o estoque
 - [x] Validação também da query e do `:id`, com o resultado em `req.validado`
 
-## Etapa 5: Solicitações
+## Etapa 5: Solicitações (#4)
 
-- [ ] Solicitante: criar solicitação pela descrição do que precisa (tipo e descrição
+- [x] Solicitante: criar solicitação pela descrição do que precisa (tipo e descrição
       obrigatórios; marca e modelo opcionais); listar as próprias; cancelar enquanto
       `PENDENTE`
-- [ ] Criar solicitação só com o perfil solicitante
-- [ ] Solicitação de outro usuário responde `404`
-- [ ] Aprovador: listar as pendentes, aprovar escolhendo o equipamento e recusar, com
+- [x] Criar solicitação só com o perfil solicitante
+- [x] Solicitação de outro usuário responde `404`
+- [x] Aprovador: listar as pendentes, aprovar escolhendo o equipamento e recusar, com
       justificativa obrigatória na recusa
-- [ ] Aprovação e recusa numa transação, com `409` se o estado mudou
-- [ ] Histórico de cada solicitação, gravado desde a criação e visível só para o dono e para
+- [x] Aprovação e recusa numa transação, com `409` se o estado mudou
+- [x] Histórico de cada solicitação, gravado desde a criação e visível só para o dono e para
       os aprovadores
-- [ ] Seed coerente com a regra: as solicitações #1 e #4 como pedidos descritos, e a data de
-      cadastro dos equipamentos anterior à das solicitações
+- [x] Seed coerente com a regra: as solicitações #1 e #4 como pedidos descritos, e a data de
+      cadastro dos usuários e dos equipamentos anterior à das solicitações
 
 ## Etapa 6: Frontend: login, equipamentos e dashboard
 
@@ -127,9 +127,17 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   número de série precisaria ser único no banco. Com IMEI ou MAC, a validação é reavaliada,
   como diz o [`DECISOES.md`](../DECISOES.md).
 - **Testes automáticos das regras críticas** (`403`, `409`, autoaprovação). A especificação
-  não pede; decidir na etapa 5, conforme o tempo.
+  não pede; reavaliar na etapa 8, se sobrar tempo. Até lá, as regras são provadas com `curl`,
+  fora do Docker e com o sistema rodando.
 
 ## Manutenção
+
+### 21/10/2026: solicitações, aprovação e recusa (#4)
+
+As seis rotas de solicitação, com o perfil exigido em cada uma, e a aprovação, a recusa e o
+cancelamento em transação, com atualização condicional. Conferidas fora do Docker, inclusive
+nos caminhos de erro, e com `docker compose up` do zero e os dados do seed, inclusive o `404`
+da solicitação de outro usuário, os `409` e o `422`.
 
 ### 20/10/2026: equipamentos e totais por status (#3)
 

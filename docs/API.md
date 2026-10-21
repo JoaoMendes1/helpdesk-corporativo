@@ -3,8 +3,8 @@
 Rotas da API, com o formato de entrada, de resposta e de erro. Quem usa é o frontend, pelo
 mesmo endereço, em `/api`, e quem avalia o projeto, com um cliente HTTP.
 
-**Estado:** 🚧 em andamento. As rotas de autenticação e o formato de erro existem desde a
-etapa 3, e as de equipamentos, desde a etapa 4. As de solicitações entram na etapa 5 do
+**Estado:** ✅ todas as rotas do obrigatório existem: as de autenticação e o formato de erro
+desde a etapa 3, as de equipamentos desde a etapa 4 e as de solicitações desde a etapa 5 do
 [`ROADMAP.md`](ROADMAP.md).
 
 ## Autenticação
@@ -148,6 +148,136 @@ inclusive os que têm zero. Resposta: `200`.
 }
 ```
 
+## Rotas de solicitações
+
+Cada rota é de um perfil só: a do solicitante responde `403` para o aprovador, e a do
+aprovador responde `403` para o solicitante. O dono da solicitação e o aprovador vêm do token:
+um `solicitanteId`, `aprovadorId` ou `status` no corpo é ignorado.
+
+Os caminhos seguem o padrão REST: substantivo no caminho e ação no método. A aprovação, a
+recusa e o cancelamento são `POST` em `/aprovacao`, `/recusa` e `/cancelamento` porque cada um
+cria um registro novo, a linha do histórico.
+
+### Formato da solicitação
+
+As seis rotas devolvem a solicitação neste formato, sozinha ou em lista:
+
+```json
+{
+  "id": 4,
+  "solicitanteId": 3,
+  "equipamentoId": 2,
+  "descricao": "Notebook para um treinamento externo.",
+  "marcaSolicitada": null,
+  "modeloSolicitado": null,
+  "tipoSolicitado": "notebook",
+  "status": "APROVADA",
+  "observacao": "Retirar com o suporte.",
+  "dtSolicitacao": "2026-10-19T13:00:00.000Z",
+  "dtDecisao": "2026-10-21T13:00:00.000Z",
+  "aprovadorId": 1,
+  "solicitante": { "id": 3, "nome": "Cristina Rocha" },
+  "aprovador": { "id": 1, "nome": "Ana Souza" },
+  "equipamento": { "id": 2, "marca": "Dell", "modelo": "Latitude 5440", "tipo": "notebook" },
+  "historicos": [
+    {
+      "id": 7,
+      "statusAnterior": null,
+      "statusNovo": "PENDENTE",
+      "observacao": null,
+      "dtRegistro": "2026-10-19T13:00:00.000Z",
+      "usuario": { "id": 3, "nome": "Cristina Rocha" }
+    },
+    {
+      "id": 9,
+      "statusAnterior": "PENDENTE",
+      "statusNovo": "APROVADA",
+      "observacao": "Retirar com o suporte.",
+      "dtRegistro": "2026-10-21T13:00:00.000Z",
+      "usuario": { "id": 1, "nome": "Ana Souza" }
+    }
+  ]
+}
+```
+
+- `equipamento` só existe na aprovação: na solicitação pendente, recusada ou cancelada, vem
+  `null`.
+- `aprovador` e `dtDecisao` vêm `null` até a aprovação ou a recusa. O cancelamento não é uma
+  decisão do aprovador e não os preenche.
+- `observacao` é a observação da aprovação ou a justificativa da recusa.
+- `historicos` tem uma linha por mudança de status, da mais antiga para a mais recente,
+  inclusive a criação, com `statusAnterior` em `null`.
+
+### `POST /api/solicitacoes`
+
+**Só o perfil `SOLICITANTE`.** Cria uma solicitação `PENDENTE`, pela descrição do que o
+solicitante precisa.
+
+| Campo do corpo | Tipo | Obrigatório? | O que é |
+|---|---|---|---|
+| `tipoSolicitado` | texto | sim | Ex.: notebook, monitor. Até 191 caracteres, gravado em minúsculas, como o `tipo` do equipamento |
+| `descricao` | texto | sim | Para que o equipamento é necessário. Até 191 caracteres |
+| `marcaSolicitada` | texto | não | Até 191 caracteres. Vazio vira `null` |
+| `modeloSolicitado` | texto | não | Até 191 caracteres. Vazio vira `null` |
+
+Espaços nas pontas são removidos em todos os campos. Resposta: `201`, com a solicitação criada
+e a primeira linha do histórico; `400` com os erros por campo.
+
+### `GET /api/solicitacoes/minhas`
+
+**Só o perfil `SOLICITANTE`.** As solicitações do usuário logado, e só as dele, da mais recente
+para a mais antiga, sem paginação. Resposta: `200`, com a lista. Sem solicitações, a lista vem
+vazia.
+
+### `GET /api/solicitacoes/pendentes`
+
+**Só o perfil `APROVADOR`.** As solicitações `PENDENTE` de todos os solicitantes, da mais
+antiga para a mais recente, sem paginação. Resposta: `200`, com a lista.
+
+### `POST /api/solicitacoes/:id/cancelamento`
+
+**Só o perfil `SOLICITANTE`, e só o dono.** Cancela a solicitação enquanto ela está
+`PENDENTE`. Não tem corpo.
+
+Resposta: `200`, com a solicitação `CANCELADA`. Erros: `400` se o id for inválido; `404` se a
+solicitação não existir ou for de outro usuário; `409` se ela já não estiver `PENDENTE`.
+
+### `POST /api/solicitacoes/:id/aprovacao`
+
+**Só o perfil `APROVADOR`.** Aprova a solicitação e empresta o equipamento escolhido.
+
+| Campo do corpo | Tipo | Obrigatório? | O que é |
+|---|---|---|---|
+| `equipamentoId` | número inteiro | sim | O equipamento a emprestar. Precisa estar `DISPONIVEL` |
+| `observacao` | texto | não | Até 1000 caracteres. Vazio é ignorado |
+
+Resposta: `200`, com a solicitação `APROVADA`. O equipamento passa a `EMPRESTADO` e aparece no
+`emprestimoAtual` de `GET /api/equipamento/:id`.
+
+Erros:
+
+| Código | Quando |
+|---|---|
+| `400` | Id inválido, `equipamentoId` faltando ou que não é número inteiro, observação acima de 1000 caracteres |
+| `404` | A solicitação não existe |
+| `422` | O equipamento não existe |
+| `409` | A solicitação já não está `PENDENTE` (`'A solicitação já não está pendente.'`) ou o equipamento já não está `DISPONIVEL` (`'O equipamento escolhido já não está disponível.'`) |
+
+A aprovação acontece numa transação: com o `409`, nada é gravado, e a solicitação continua
+`PENDENTE`. O mecanismo está no [`ARQUITETURA.md`](ARQUITETURA.md).
+
+### `POST /api/solicitacoes/:id/recusa`
+
+**Só o perfil `APROVADOR`.** Recusa a solicitação, com justificativa. O equipamento não muda.
+
+| Campo do corpo | Tipo | Obrigatório? | O que é |
+|---|---|---|---|
+| `observacao` | texto | sim | A justificativa da recusa, que o solicitante vê no histórico. Até 1000 caracteres |
+
+Resposta: `200`, com a solicitação `RECUSADA`. Erros: `400` se o id for inválido ou a
+justificativa estiver faltando ou acima de 1000 caracteres; `404` se a solicitação não existir;
+`409` se ela já não estiver `PENDENTE`.
+
 ## Erros
 
 Toda resposta de erro segue o mesmo formato:
@@ -168,11 +298,11 @@ O critério de cada status está no [`DECISOES.md`](../DECISOES.md).
 
 | Código | Quando |
 |---|---|
-| `400` | Corpo ou parâmetros fora do formato: JSON malformado, campo obrigatório faltando (inclusive a justificativa da recusa), tipo errado, texto acima de 191 caracteres, id que não é número, filtro de `status` desconhecido |
+| `400` | Corpo ou parâmetros fora do formato: JSON malformado, campo obrigatório faltando (inclusive a justificativa da recusa e o equipamento da aprovação), tipo errado, texto acima do limite, id que não é número, filtro de `status` desconhecido |
 | `401` | Sem login, ou com token inválido ou expirado; e-mail ou senha errados; usuário inativo |
-| `403` | Perfil sem permissão para a rota: solicitante nas rotas de equipamentos, aprovador criando solicitação |
+| `403` | Perfil sem permissão para a rota: solicitante nas rotas de equipamentos, nas pendentes, na aprovação e na recusa; aprovador criando, listando "minhas" ou cancelando solicitação |
 | `404` | Recurso ou rota não encontrados, inclusive solicitação de outro usuário |
 | `409` | O estado mudou: solicitação que já não está `PENDENTE`, equipamento que já não está `DISPONIVEL` |
-| `422` | Formato certo, mas a regra não aceita: aprovar sem informar o equipamento quando a solicitação não tem um |
+| `422` | Formato certo, mas a regra não aceita: aprovar com um equipamento que não existe |
 | `500` | Erro inesperado no servidor. O detalhe vai só para o log, nunca para a resposta |
 | `503` | Banco de dados indisponível. A requisição pode ser repetida em seguida |

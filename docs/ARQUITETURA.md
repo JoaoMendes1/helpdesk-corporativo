@@ -3,10 +3,10 @@
 Como o sistema funciona por dentro. O motivo de cada escolha está no
 [`DECISOES.md`](../DECISOES.md).
 
-**Estado:** 🚧 em construção. Já existem os três containers, o banco com as migrations e o
-seed, e a base da API: formato de erro, validação de entrada e autenticação. As outras seções
-passam a descrever o que existe à medida que as etapas do [`ROADMAP.md`](ROADMAP.md) ficam
-prontas.
+**Estado:** 🚧 em construção. O backend está completo: os três containers, o banco com as
+migrations e o seed, e a API com o formato de erro, a validação de entrada, a autenticação e as
+rotas de equipamentos e de solicitações. O frontend entra nas etapas 6 e 7 do
+[`ROADMAP.md`](ROADMAP.md).
 
 ## Visão geral
 
@@ -92,9 +92,9 @@ express.json → cookie-parser → /api/health → rotas de autenticação → a
   regras vêm sempre daí, nunca do corpo, da URL ou da query string.** O middleware não
   consulta o banco: um usuário desativado mantém o acesso até o token vencer.
 - Todas as rotas da `/api` exigem login, menos a de login e a de saúde (`/api/health`).
-- As rotas de equipamentos (cadastro, lista, detalhe e totais) e as de decisão sobre
-  solicitação exigem também o perfil `APROVADOR`; a de criar solicitação, o perfil
-  `SOLICITANTE`.
+- As rotas de equipamentos (cadastro, lista, detalhe e totais) e as de solicitação do
+  aprovador (pendentes, aprovação e recusa) exigem também o perfil `APROVADOR`; as do
+  solicitante (criação, "minhas" e cancelamento), o perfil `SOLICITANTE`.
 - O perfil é exigido em cada rota, nunca com `router.use`. Num router montado em `/api`, o
   `router.use` vale para toda requisição que passa por ele: o solicitante receberia `403` nas
   rotas de outros routers e até em rotas inexistentes.
@@ -116,6 +116,28 @@ O modelo de dados é o da especificação, com quatro tabelas:
   listagem (`status` e `tipo`), e `solicitacoes` ganha `[status, dtSolicitacao]`, para a
   lista de pendentes. Todos entram na primeira migration.
 - **Schema versionado** nas migrations do Prisma, em `backend/prisma/migrations/`.
+
+## Decisão sobre solicitações
+
+A aprovação, a recusa e o cancelamento rodam, cada um, numa transação do Prisma
+(`$transaction`): ou tudo é gravado, ou nada.
+
+| Ordem | O que acontece | Para quê |
+|---|---|---|
+| 1 | Busca a solicitação e, na aprovação, o equipamento | Escolher o código certo: `404` ou `422` |
+| 2 | `UPDATE` da solicitação com `status = PENDENTE` na condição | Quem chega depois afeta zero linhas e recebe `409` |
+| 3 | Na aprovação, `UPDATE` do equipamento com `status = DISPONIVEL` na condição | O mesmo equipamento não é emprestado duas vezes |
+| 4 | Grava a linha do histórico | Toda mudança de status fica registrada |
+
+- A condição dentro do `UPDATE` é o que impede a decisão em dobro: o banco confere e altera a
+  linha de uma vez, e a trava até o fim da transação. A busca do passo 1 sozinha não protege,
+  porque outro pedido pode mudar o status entre a busca e a alteração.
+- Um erro em qualquer passo desfaz os anteriores: se o equipamento já foi emprestado, a
+  solicitação volta a `PENDENTE`.
+- Os bloqueios seguem sempre a mesma ordem, solicitação e depois equipamento, para que duas
+  transações não fiquem esperando uma pela outra (*deadlock*).
+- A criação não precisa de `$transaction`: a solicitação e a primeira linha do histórico vão
+  num único `create`, com o histórico aninhado.
 
 ## Rotas
 
