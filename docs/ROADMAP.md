@@ -13,7 +13,7 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 5 · Solicitações | ✅ Concluída |
 | 6 · Frontend: login, equipamentos e dashboard | ✅ Concluída |
 | 7 · Frontend: solicitações e aprovação | ✅ Concluída |
-| 8 · Entrega | � Próxima |
+| 8 · Entrega | 🚧 Próxima |
 | 9 · Depois da entrega (`optional`) | 🕐 Planejada |
 
 Legenda: ✅ Concluída · 🚧 Em andamento ou próxima · 🕐 Planejada.
