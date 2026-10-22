@@ -1,111 +1,50 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* Cores do protótipo (docs/prototipo/helpdesk-v1.html). Cada uma gera as classes bg-, text- e border-. */
+@theme {
+  --color-fundo: #ffffff;
+  --color-superficie: #ffffff;
+  --color-superficie-2: #f7f8f9;
+  --color-texto: #1e2939;
+  --color-texto-2: #4a5565;
+  --color-suave: #6a7282;
+  --color-linha: #e4e6ea;
+  --color-linha-forte: #c9ced6;
+  --color-menu: #fafafa;
+  --color-hover: #f0f1f3;
+  --color-marca: #78a118;
+  --color-marca-texto: #4f6d10;
+  --color-marca-claro: #eef5df;
+  --color-destaque: #59c935;
+  --color-azul: #1d4f9c;
+  --color-botao: #587a11;
+  --color-botao-hover: #4f6d10;
+  --color-perigo: #b42318;
+  --color-ok-fundo: #e7f8e0;
+  --color-ok-texto: #3c7a12;
+  --color-info-fundo: #e6f0f5;
+  --color-info-texto: #2c6e8f;
+  --color-aviso-fundo: #fdf3e1;
+  --color-aviso-texto: #8a5a12;
+  --color-erro-fundo: #fdecea;
+  --color-erro-texto: #b42318;
+  --color-neutro-fundo: #eef0f3;
+  --color-neutro-texto: #4a5565;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+@layer base {
+  body {
+    background-color: var(--color-fundo);
+    color: var(--color-texto);
+    font-size: 14.5px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  :focus-visible {
+    outline: 2px solid var(--color-marca);
+    outline-offset: 2px;
   }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }
