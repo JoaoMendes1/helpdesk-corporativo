@@ -5,7 +5,7 @@ arquivo reúne as escolhas que ela deixa em aberto, com o motivo e o custo aceit
 são minhas; a coluna **Alinhada com a equipe** marca as que confirmei com a equipe responsável
 pelo teste antes de implementar. As versões seguem as linhas que essa equipe usa.
 
-Registradas em 17/10/2026 · atualizadas em 20/10/2026.
+Registradas em 17/10/2026 · atualizadas em 22/10/2026.
 
 ## Padrões de projeto
 
@@ -18,6 +18,7 @@ Registradas em 17/10/2026 · atualizadas em 20/10/2026.
 | Singleton | Prisma Client, em `lib/` | Um único pool de conexões para a aplicação inteira |
 | Transação com atualização condicional | Aprovação e recusa | Tudo ou nada, e nenhuma decisão em dobro |
 | Proxy reverso | Caddy, na frente de tudo | Um endereço só para o navegador, sem CORS |
+| Contexto (provider) | Sessão no frontend | Quem está logado fica disponível para todas as telas, sem ser repassado de componente em componente |
 
 ## Arquitetura
 
@@ -27,6 +28,8 @@ Registradas em 17/10/2026 · atualizadas em 20/10/2026.
 | Um formato de erro, com o status pelo tipo de problema | Não | O frontend trata os erros num lugar só. `400` é pedido fora do formato, `422` é formato certo que a regra recusa, `409` é estado que mudou. A lista está no [`docs/API.md`](docs/API.md) | Cada regra precisa dizer qual erro lança |
 | Validação com `zod`, e não com o `validator` | Não | Um schema descreve a entrada inteira e devolve os erros por campo, prontos para o `400`. O `validator` confere um texto de cada vez | Uma dependência a mais. Reavaliar se o cadastro ganhar IMEI ou MAC: o `validator` entra dentro do schema, sem trocar de biblioteca |
 | Caddy na frente do frontend e da API | Não | O navegador fala com um endereço só: não há CORS para configurar nem origem para liberar | Um container a mais |
+| Estado das telas com `useState` e `useEffect`, sem biblioteca de cache | Não | A especificação pede o gerenciamento dos estados de carregamento, erro e validação. Feito em cada tela, ele fica explícito e cabe no tamanho do projeto | Cada tela repete o mesmo padrão, e uma tela não se atualiza sozinha quando outra muda os dados |
+| React Router 7, e não o 8 | Sim | É a linha que a equipe usa. A 8 saiu em 17/06/2026, e o projeto atenderia aos requisitos dela (React 19.2.7 e Vite 7), mas as versões seguem as linhas da equipe | A linha 7 recebe só correções de segurança. A migração para a 8 é pequena, e pode ser feita se o projeto continuar |
 
 ## Segurança
 

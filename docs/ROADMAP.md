@@ -2,7 +2,7 @@
 
 As etapas do teste técnico, o que já está pronto e o que vem depois.
 
-## Status (21/10/2026)
+## Status (22/10/2026)
 
 | Etapa | Status |
 |---|---|
@@ -11,8 +11,8 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 3 · Base da API e login | ✅ Concluída |
 | 4 · Equipamentos e dashboard | ✅ Concluída |
 | 5 · Solicitações | ✅ Concluída |
-| 6 · Frontend: login, equipamentos e dashboard | 🚧 Próxima |
-| 7 · Frontend: solicitações e aprovação | 🕐 Planejada |
+| 6 · Frontend: login, equipamentos e dashboard | ✅ Concluída |
+| 7 · Frontend: solicitações e aprovação | 🚧 Próxima |
 | 8 · Entrega | 🕐 Planejada |
 | 9 · Depois da entrega (`optional`) | 🕐 Planejada |
 
@@ -84,14 +84,17 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] Seed coerente com a regra: as solicitações #1 e #4 como pedidos descritos, e a data de
       cadastro dos usuários e dos equipamentos anterior à das solicitações
 
-## Etapa 6: Frontend: login, equipamentos e dashboard
+## Etapa 6: Frontend: login, equipamentos e dashboard (#5)
 
 - [x] Decidir onde o token fica guardado: cookie `httpOnly`, decidido antes, porque a
       etapa 3 já dependia da resposta
-- [ ] Tela de login, levando o solicitante direto às suas solicitações
-- [ ] Lista de equipamentos com filtros e cadastro, só para o aprovador
-- [ ] Dashboard do aprovador com os totais por status
-- [ ] Estados de carregamento e erro em todas as telas, e de validação nas que têm formulário
+- [x] Tailwind e React Router 7, com o `npm run dev` repassando `/api` ao Caddy
+- [x] Sessão pelo `GET /api/me` e rotas por perfil, com a mensagem de permissão
+- [x] Tela de login, levando o solicitante direto às suas solicitações
+- [x] Lista de equipamentos com filtros e cadastro, só para o aprovador
+- [x] Detalhe do equipamento, com quem cadastrou e o empréstimo atual
+- [x] Dashboard do aprovador com os totais por status
+- [x] Estados de carregamento e erro em todas as telas, e de validação nas que têm formulário
 
 ## Etapa 7: Frontend: solicitações e aprovação
 
@@ -113,6 +116,7 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [ ] CI na `staging`
 - [ ] Deploy na VPS, com as duas imagens (backend e frontend)
 - [ ] Estudo de caso no portfólio
+- [ ] Modo escuro e menu recolhível, como no protótipo
 
 ## Dívida técnica conhecida
 
@@ -131,6 +135,12 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   fora do Docker e com o sistema rodando.
 
 ## Manutenção
+
+### 22/10/2026: frontend com login, equipamentos e painel (#5)
+
+As telas de login, painel, equipamentos (lista, filtros e detalhe) e novo equipamento, com a
+sessão pelo `GET /api/me` e as rotas por perfil. Conferidas com o `npm run dev` e com
+`docker compose up --build` do zero, inclusive com o backend fora do ar.
 
 ### 21/10/2026: solicitações, aprovação e recusa (#4)
 

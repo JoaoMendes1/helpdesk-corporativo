@@ -3,8 +3,10 @@ import { Layout } from './components/Layout'
 import { RotaProtegida } from './components/RotaProtegida'
 import { useAutenticacao } from './hooks/useAutenticacao'
 import { EmBreve } from './pages/EmBreve'
+import { Equipamentos } from './pages/Equipamentos'
 import { Painel } from './pages/Painel'
 import { Login } from './pages/Login'
+import { NovoEquipamento } from './pages/NovoEquipamento'
 
 // O solicitante não vê o estoque: começa nas próprias solicitações.
 function Inicio() {
@@ -23,8 +25,8 @@ function App() {
 
           <Route element={<RotaProtegida perfil="APROVADOR" />}>
             <Route path="/painel" element={<Painel />} />
-            <Route path="/equipamentos" element={<EmBreve titulo="Equipamentos" />} />
-            <Route path="/equipamentos/novo" element={<EmBreve titulo="Novo equipamento" />} />
+            <Route path="/equipamentos" element={<Equipamentos />} />
+            <Route path="/equipamentos/novo" element={<NovoEquipamento />} />
             <Route path="/solicitacoes/pendentes" element={<EmBreve titulo="Solicitações pendentes" />} />
           </Route>
 

@@ -63,8 +63,9 @@ Valem só aqui. Cada uma tem o motivo, para não ser quebrada sem saber o custo.
     Prisma, não do código da aplicação), nem o Quick Fix da extensão do VS Code, que deve
     ficar fixada no 6 com o comando "Prisma: Pin to Prisma 6".
 - **As bibliotecas seguem as linhas que a equipe responsável pelo teste usa** (Express 5,
-  Prisma 6, React 19), sempre na versão mais recente de cada linha. A verificação de
-  dependências (regra 6) vale dentro dessas linhas.
+  Prisma 6, React 19, React Router 7), sempre na versão mais recente de cada linha. A
+  verificação de dependências (regra 6) vale dentro dessas linhas: o React Router fica no 7,
+  mesmo com o 8 disponível.
 - **No container, as migrations são aplicadas com `prisma migrate deploy`, nunca com
   `migrate dev`.** O `migrate dev` é interativo, compara o schema com o banco e pode pedir
   para apagá-lo. O seed só popula o banco vazio, para que subir de novo não duplique dados.

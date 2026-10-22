@@ -5,8 +5,8 @@ Como o sistema funciona por dentro. O motivo de cada escolha está no
 
 **Estado:** 🚧 em construção. O backend está completo: os três containers, o banco com as
 migrations e o seed, e a API com o formato de erro, a validação de entrada, a autenticação e as
-rotas de equipamentos e de solicitações. O frontend entra nas etapas 6 e 7 do
-[`ROADMAP.md`](ROADMAP.md).
+rotas de equipamentos e de solicitações. O frontend tem o login, o painel e as telas de
+equipamentos; as telas de solicitação entram na etapa 7 do [`ROADMAP.md`](ROADMAP.md).
 
 ## Visão geral
 
@@ -73,6 +73,40 @@ express.json → cookie-parser → /api/health → rotas de autenticação → a
 - O `tratarErros` responde no formato padrão, descrito no [`API.md`](API.md).
 - JSON malformado no corpo vira `400`. Banco inacessível ou conexão perdida viram `503`.
   Qualquer outro erro vira `500`, com o detalhe só no log.
+
+## Frontend
+
+React 19 com Vite e TypeScript, estilo com Tailwind e rotas com React Router 7. O build vira
+arquivos estáticos, que o Caddy serve.
+
+| Pasta em `frontend/src/` | O que fica nela |
+|---|---|
+| `pages/` | Uma tela por arquivo, ligada a um endereço em `App.tsx` |
+| `components/` | Partes reaproveitadas: o layout, a rota protegida, o campo de formulário, o alerta, a etiqueta de status e os estados de carregamento, erro e vazio |
+| `contexts/` e `hooks/` | A sessão: quem está logado, com as funções de entrar e sair |
+| `lib/` | A chamada à API (`api.ts`), os rótulos e formatos de exibição e as classes de estilo repetidas |
+| `tipos.ts` | O formato dos dados da API, como no [`API.md`](API.md) |
+
+- **Chamada à API:** toda requisição passa pela função `requisitar`, em `lib/api.ts`. O
+  endereço é sempre relativo (`/api/...`): o navegador envia o cookie sozinho, e não há CORS.
+  Erro vira um `ErroApi`, com o status, a mensagem e os erros por campo do formato padrão. Sem
+  resposta, ou com o `502` do Caddy quando o backend está fora, a mensagem é a de serviço
+  indisponível.
+- **Sessão:** o JavaScript não lê o cookie `httpOnly`. Ao abrir, o frontend consulta
+  `GET /api/me` e guarda o usuário num contexto do React. Qualquer `401` da API limpa o usuário
+  e leva ao login.
+- **Rotas por perfil:** o componente `RotaProtegida` leva ao login quem não está logado e mostra
+  a mensagem de permissão a quem tem o perfil errado. É conveniência da tela: a proteção é o
+  `403` da API.
+- **Estados:** cada tela trata carregamento, erro (com "Tentar novamente") e lista vazia. Os
+  formulários validam na tela as mesmas regras da API e mostram embaixo de cada campo os erros
+  do `400`.
+- **Filtros no endereço:** os filtros da lista de equipamentos ficam na query string
+  (`?status=...&tipo=...`). O F5 os mantém, e os cartões do painel abrem a lista já filtrada.
+- **Texto do usuário** é exibido sempre como texto pelo React, nunca como HTML.
+- **Desenvolvimento:** com o `docker compose up` rodando, `npm run dev` na pasta `frontend` sobe
+  o Vite em `localhost:5173`, que repassa `/api` ao Caddy na porta 8080. A porta 8080 mostra o
+  build copiado para a imagem, e só pega o código novo com `docker compose up --build`.
 
 ## Autenticação
 

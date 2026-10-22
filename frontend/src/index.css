@@ -35,6 +35,11 @@
 }
 
 @layer base {
+  /* Controles nativos do navegador (sugestões, listas de opções) no tema claro, como o resto da tela. */
+  :root {
+    color-scheme: light;
+  }
+
   body {
     background-color: var(--color-fundo);
     color: var(--color-texto);
