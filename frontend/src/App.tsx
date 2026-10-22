@@ -2,11 +2,13 @@ import { Navigate, Route, Routes } from 'react-router'
 import { Layout } from './components/Layout'
 import { RotaProtegida } from './components/RotaProtegida'
 import { useAutenticacao } from './hooks/useAutenticacao'
-import { EmBreve } from './pages/EmBreve'
 import { Equipamentos } from './pages/Equipamentos'
 import { Painel } from './pages/Painel'
 import { Login } from './pages/Login'
+import { MinhasSolicitacoes } from './pages/MinhasSolicitacoes'
+import { NovaSolicitacao } from './pages/NovaSolicitacao'
 import { NovoEquipamento } from './pages/NovoEquipamento'
+import { SolicitacoesPendentes } from './pages/SolicitacoesPendentes'
 
 // O solicitante não vê o estoque: começa nas próprias solicitações.
 function Inicio() {
@@ -27,12 +29,12 @@ function App() {
             <Route path="/painel" element={<Painel />} />
             <Route path="/equipamentos" element={<Equipamentos />} />
             <Route path="/equipamentos/novo" element={<NovoEquipamento />} />
-            <Route path="/solicitacoes/pendentes" element={<EmBreve titulo="Solicitações pendentes" />} />
+            <Route path="/solicitacoes/pendentes" element={<SolicitacoesPendentes />} />
           </Route>
 
           <Route element={<RotaProtegida perfil="SOLICITANTE" />}>
-            <Route path="/solicitacoes" element={<EmBreve titulo="Minhas solicitações" />} />
-            <Route path="/solicitacoes/nova" element={<EmBreve titulo="Nova solicitação" />} />
+            <Route path="/solicitacoes" element={<MinhasSolicitacoes />} />
+            <Route path="/solicitacoes/nova" element={<NovaSolicitacao />} />
           </Route>
         </Route>
       </Route>

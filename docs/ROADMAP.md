@@ -12,8 +12,8 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 4 · Equipamentos e dashboard | ✅ Concluída |
 | 5 · Solicitações | ✅ Concluída |
 | 6 · Frontend: login, equipamentos e dashboard | ✅ Concluída |
-| 7 · Frontend: solicitações e aprovação | 🚧 Próxima |
-| 8 · Entrega | 🕐 Planejada |
+| 7 · Frontend: solicitações e aprovação | ✅ Concluída |
+| 8 · Entrega | � Próxima |
 | 9 · Depois da entrega (`optional`) | 🕐 Planejada |
 
 Legenda: ✅ Concluída · 🚧 Em andamento ou próxima · 🕐 Planejada.
@@ -96,12 +96,14 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] Dashboard do aprovador com os totais por status
 - [x] Estados de carregamento e erro em todas as telas, e de validação nas que têm formulário
 
-## Etapa 7: Frontend: solicitações e aprovação
+## Etapa 7: Frontend: solicitações e aprovação (#6)
 
-- [ ] Solicitante: nova solicitação, pela descrição, e minhas solicitações, com status e
-      histórico
-- [ ] Aprovador: solicitações pendentes, com aprovar e recusar
-- [ ] Estados de carregamento, erro e validação
+- [x] Solicitante: nova solicitação, pela descrição, e minhas solicitações, com status,
+      histórico e cancelamento enquanto `PENDENTE`
+- [x] Aprovador: solicitações pendentes, com aprovar (escolhendo um equipamento disponível) e
+      recusar (com justificativa)
+- [x] Decisão tomada por outro aprovador (`409`): a mensagem da API e a lista recarregada
+- [x] Estados de carregamento, erro e validação
 
 ## Etapa 8: Entrega
 
@@ -135,6 +137,13 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   fora do Docker e com o sistema rodando.
 
 ## Manutenção
+
+### 22/10/2026: frontend com solicitações, aprovação e recusa (#6)
+
+As telas de Minhas solicitações, com o histórico e o cancelamento, de Nova solicitação e de
+Solicitações pendentes, com a aprovação e a recusa. Conferidas com o `npm run dev` e com
+`docker compose up --build` do zero, inclusive o `409` com dois aprovadores ao mesmo tempo e o
+backend fora do ar.
 
 ### 22/10/2026: frontend com login, equipamentos e painel (#5)
 

@@ -3,10 +3,10 @@
 Como o sistema funciona por dentro. O motivo de cada escolha está no
 [`DECISOES.md`](../DECISOES.md).
 
-**Estado:** 🚧 em construção. O backend está completo: os três containers, o banco com as
-migrations e o seed, e a API com o formato de erro, a validação de entrada, a autenticação e as
-rotas de equipamentos e de solicitações. O frontend tem o login, o painel e as telas de
-equipamentos; as telas de solicitação entram na etapa 7 do [`ROADMAP.md`](ROADMAP.md).
+**Estado:** ✅ o obrigatório está completo: os três containers, o banco com as migrations e o
+seed, a API com o formato de erro, a validação de entrada, a autenticação e as rotas de
+equipamentos e de solicitações, e o frontend com todas as telas dos dois perfis. O que falta para
+a entrega está na etapa 8 do [`ROADMAP.md`](ROADMAP.md).
 
 ## Visão geral
 
@@ -82,7 +82,7 @@ arquivos estáticos, que o Caddy serve.
 | Pasta em `frontend/src/` | O que fica nela |
 |---|---|
 | `pages/` | Uma tela por arquivo, ligada a um endereço em `App.tsx` |
-| `components/` | Partes reaproveitadas: o layout, a rota protegida, o campo de formulário, o alerta, a etiqueta de status e os estados de carregamento, erro e vazio |
+| `components/` | Partes reaproveitadas: o layout, a rota protegida, o campo de formulário, o alerta, a etiqueta de status, os estados de carregamento, erro e vazio, o cartão da solicitação e as janelas de confirmação |
 | `contexts/` e `hooks/` | A sessão: quem está logado, com as funções de entrar e sair |
 | `lib/` | A chamada à API (`api.ts`), os rótulos e formatos de exibição e as classes de estilo repetidas |
 | `tipos.ts` | O formato dos dados da API, como no [`API.md`](API.md) |
@@ -101,6 +101,10 @@ arquivos estáticos, que o Caddy serve.
 - **Estados:** cada tela trata carregamento, erro (com "Tentar novamente") e lista vazia. Os
   formulários validam na tela as mesmas regras da API e mostram embaixo de cada campo os erros
   do `400`.
+- **Decisões e cancelamento:** a tela usa a solicitação que a API devolve, sem nova consulta. Com
+  `404`, `409` ou `422`, a solicitação ou o equipamento mudou fora da tela: o diálogo mostra a
+  mensagem da API, desativa a confirmação e, ao fechar, a lista é buscada de novo. Os
+  equipamentos para aprovar são buscados ao abrir o diálogo, porque mudam a cada aprovação.
 - **Filtros no endereço:** os filtros da lista de equipamentos ficam na query string
   (`?status=...&tipo=...`). O F5 os mantém, e os cartões do painel abrem a lista já filtrada.
 - **Texto do usuário** é exibido sempre como texto pelo React, nunca como HTML.

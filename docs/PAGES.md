@@ -15,9 +15,9 @@ dados fictícios, e a barra do topo troca a tela, o perfil e o estado da página
 | Dashboard: totais de equipamentos por status | Aprovador | ✅ Implementada | 6 | `frontend/src/pages/Painel.tsx` |
 | Equipamentos: lista com filtros por status e tipo, e detalhe | Aprovador | ✅ Implementada | 6 | `frontend/src/pages/Equipamentos.tsx` |
 | Novo equipamento | Aprovador | ✅ Implementada | 6 | `frontend/src/pages/NovoEquipamento.tsx` |
-| Minhas solicitações: status e histórico de observações | Solicitante | 🎨 Prototipada | 7 | |
-| Nova solicitação: descrição do equipamento de que precisa | Solicitante | 🎨 Prototipada | 7 | |
-| Solicitações pendentes: aprovar ou recusar com justificativa | Aprovador | 🎨 Prototipada | 7 | |
+| Minhas solicitações: status e histórico de observações | Solicitante | ✅ Implementada | 7 | `frontend/src/pages/MinhasSolicitacoes.tsx` |
+| Nova solicitação: descrição do equipamento de que precisa | Solicitante | ✅ Implementada | 7 | `frontend/src/pages/NovaSolicitacao.tsx` |
+| Solicitações pendentes: aprovar ou recusar com justificativa | Aprovador | ✅ Implementada | 7 | `frontend/src/pages/SolicitacoesPendentes.tsx` |
 
 Status possíveis: ✅ Implementada · 🎨 Prototipada · 🕐 Planejada.
 
@@ -30,5 +30,10 @@ Status possíveis: ✅ Implementada · 🎨 Prototipada · 🕐 Planejada.
 - **Tipo no cadastro de equipamento:** é escolhido numa lista dos tipos existentes, com a
   opção "Outro tipo…" para um tipo novo, em vez de texto livre com sugestões. Assim, um erro
   de digitação não cria um tipo separado nos filtros.
-- **Aviso de sucesso:** aparece no topo da lista de equipamentos, com a linha nova destacada,
-  em vez do aviso temporário no canto da tela.
+- **Aviso de sucesso:** aparece no topo da tela, em vez do aviso temporário no canto: na lista
+  de equipamentos, com a linha nova destacada; em Minhas solicitações, com o cartão novo
+  destacado; e depois de cancelar, aprovar ou recusar.
+- **Conflito (`409`):** além da mensagem da API, a lista é recarregada ao fechar o diálogo, porque
+  a solicitação ou o equipamento mudou fora da tela.
+- **Aprovar sem equipamento disponível:** o diálogo mostra só o aviso, sem o campo de observação,
+  porque não há o que aprovar.

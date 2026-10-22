@@ -7,3 +7,6 @@ export const CLASSE_BOTAO =
 
 export const CLASSE_BOTAO_SECUNDARIO =
   'inline-flex items-center justify-center gap-2 rounded-lg border border-linha-forte bg-superficie px-4 py-2.5 text-[13.5px] font-bold text-texto hover:border-marca hover:bg-superficie-2'
+
+export const CLASSE_BOTAO_PERIGO =
+  'inline-flex items-center justify-center gap-2 rounded-lg bg-perigo px-4 py-2.5 text-[13.5px] font-bold text-white hover:brightness-90 disabled:cursor-progress disabled:opacity-60'

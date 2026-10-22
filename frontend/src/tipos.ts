@@ -38,13 +38,30 @@ export type Totais = {
   porStatus: Record<StatusEquipamento, number>
 }
 
+export type Historico = {
+  id: number
+  statusAnterior: StatusSolicitacao | null
+  statusNovo: StatusSolicitacao
+  observacao: string | null
+  dtRegistro: string
+  usuario: Pessoa
+}
+
 export type Solicitacao = {
   id: number
-  tipoSolicitado: string
+  solicitanteId: number
+  equipamentoId: number | null
+  descricao: string
   marcaSolicitada: string | null
   modeloSolicitado: string | null
-  descricao: string
+  tipoSolicitado: string
   status: StatusSolicitacao
+  observacao: string | null
   dtSolicitacao: string
+  dtDecisao: string | null
+  aprovadorId: number | null
   solicitante: Pessoa
+  aprovador: Pessoa | null
+  equipamento: Pick<Equipamento, 'id' | 'marca' | 'modelo' | 'tipo'> | null
+  historicos: Historico[]
 }

@@ -6,10 +6,8 @@ import { Campo } from '../components/Campo'
 import { ErroApi, requisitar } from '../lib/api'
 import { CLASSE_BOTAO, CLASSE_BOTAO_SECUNDARIO, CLASSE_ENTRADA } from '../lib/estilos'
 import { capitalizar, ROTULO_STATUS_EQUIPAMENTO, STATUS_EQUIPAMENTO } from '../lib/formatos'
+import { MAX_TEXTO } from '../lib/limites'
 import type { Equipamento, StatusEquipamento } from '../tipos'
-
-// Tamanho das colunas de texto no banco, o mesmo limite da API.
-const MAX_TEXTO = 191
 
 // Valor da opção "Outro tipo…". Os tipos gravados não começam com "_".
 const OUTRO_TIPO = '__outro'
