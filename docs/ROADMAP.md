@@ -2,7 +2,7 @@
 
 As etapas do teste técnico, o que já está pronto e o que vem depois.
 
-## Status (22/10/2026)
+## Status (23/10/2026)
 
 | Etapa | Status |
 |---|---|
@@ -133,10 +133,15 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   número de série precisaria ser único no banco. Com IMEI ou MAC, a validação é reavaliada,
   como diz o [`DECISOES.md`](../DECISOES.md).
 - **Testes automáticos das regras críticas** (`403`, `409`, autoaprovação). A especificação
-  não pede; reavaliar na etapa 8, se sobrar tempo. Até lá, as regras são provadas com `curl`,
-  fora do Docker e com o sistema rodando.
+  não pede, e ficaram fora da entrega (etapa 8): as regras foram provadas com `curl`, fora do
+  Docker e com o sistema rodando, e as telas, no navegador.
 
 ## Manutenção
+
+### 23/10/2026: entrega
+
+O uso de IA de todas as etapas no `README.md`, a tabela de requisitos toda em ✅ e a revisão
+final dos documentos. Conferida com `git clone` numa pasta nova e `docker compose up` do zero.
 
 ### 22/10/2026: frontend com solicitações, aprovação e recusa (#6)
 
