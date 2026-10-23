@@ -78,7 +78,7 @@ export function Layout() {
           <span className="grid size-9.5 flex-none place-items-center rounded-full bg-marca-claro text-[13px] font-extrabold text-marca-texto" aria-hidden="true">
             {iniciais(usuario.nome)}
           </span>
-          <button type="button" onClick={sair} className={`${CLASSE_BOTAO_SECUNDARIO} px-3 py-2`}>
+          <button type="button" onClick={sair} className={CLASSE_BOTAO_SECUNDARIO}>
             <Icone nome="sair" tamanho={16} />
             Sair
           </button>

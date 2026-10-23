@@ -13,8 +13,8 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 5 · Solicitações | ✅ Concluída |
 | 6 · Frontend: login, equipamentos e dashboard | ✅ Concluída |
 | 7 · Frontend: solicitações e aprovação | ✅ Concluída |
-| 8 · Entrega | 🚧 Próxima |
-| 9 · Depois da entrega (`optional`) | 🕐 Planejada |
+| 8 · Entrega | ✅ Concluída |
+| 9 · Depois da entrega (`optional`) | 🚧 Próxima |
 
 Legenda: ✅ Concluída · 🚧 Em andamento ou próxima · 🕐 Planejada.
 
@@ -107,11 +107,11 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 
 ## Etapa 8: Entrega
 
-- [ ] `README.md` com o passo a passo conferido e o uso de IA de todas as etapas
-- [ ] Tabela de requisitos do `README.md` toda em ✅
-- [ ] `DECISOES.md` sem decisão pendente que afete a entrega
-- [ ] Teste em clone limpo: `git clone` numa pasta nova e `docker compose up` do zero
-- [ ] Revisão final dos documentos
+- [x] `README.md` com o passo a passo conferido e o uso de IA de todas as etapas
+- [x] Tabela de requisitos do `README.md` toda em ✅
+- [x] `DECISOES.md` sem decisão pendente que afete a entrega
+- [x] Teste em clone limpo: `git clone` numa pasta nova e `docker compose up` do zero
+- [x] Revisão final dos documentos
 
 ## Etapa 9: Depois da entrega (`optional`)
 

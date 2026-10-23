@@ -5,8 +5,7 @@ Como o sistema funciona por dentro. O motivo de cada escolha está no
 
 **Estado:** ✅ o obrigatório está completo: os três containers, o banco com as migrations e o
 seed, a API com o formato de erro, a validação de entrada, a autenticação e as rotas de
-equipamentos e de solicitações, e o frontend com todas as telas dos dois perfis. O que falta para
-a entrega está na etapa 8 do [`ROADMAP.md`](ROADMAP.md).
+equipamentos e de solicitações, e o frontend com todas as telas dos dois perfis.
 
 ## Visão geral
 

@@ -127,7 +127,7 @@ export function Equipamentos() {
           </select>
         </div>
         {temFiltro && (
-          <button type="button" onClick={limparFiltros} className={`${CLASSE_BOTAO_SECUNDARIO} px-3 py-2`}>
+          <button type="button" onClick={limparFiltros} className={CLASSE_BOTAO_SECUNDARIO}>
             Limpar filtros
           </button>
         )}

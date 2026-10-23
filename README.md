@@ -4,8 +4,8 @@ Sistema de solicitação e aprovação de equipamentos, feito como teste técnic
 solicitante pede equipamentos e acompanha as próprias solicitações; o aprovador cadastra os
 equipamentos e decide cada pedido, com justificativa.
 
-**Estado:** 🚧 em desenvolvimento. O andamento por etapa está no
-[`docs/ROADMAP.md`](docs/ROADMAP.md).
+**Estado:** ✅ pronto para avaliação: todos os requisitos da especificação estão implementados. O
+histórico por etapa está no [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Requisitos da especificação
 
@@ -21,8 +21,8 @@ equipamentos e decide cada pedido, com justificativa.
 | Variáveis de ambiente e `.env.example` sem senhas | ✅ Pronto | [`.env.example`](.env.example) |
 | Migrations e seed no primeiro boot, com histórico | ✅ Pronto | [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md) |
 | Dashboard com os totais de equipamentos por status | ✅ Pronto | [`docs/PAGES.md`](docs/PAGES.md) |
-| `README.md` com o passo a passo e o uso de IA | 🚧 Em andamento | Este arquivo |
-| `DECISOES.md` com as decisões e os padrões de projeto | 🚧 Em andamento | [`DECISOES.md`](DECISOES.md) |
+| `README.md` com o passo a passo e o uso de IA | ✅ Pronto | Este arquivo |
+| `DECISOES.md` com as decisões e os padrões de projeto | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
 | Diferencial: login com JWT | ✅ Pronto | [`DECISOES.md`](DECISOES.md) |
 
 ## Como rodar
@@ -85,7 +85,7 @@ para `.env` e preencha `FRONTEND_PORT` com outra porta.
 
 **Ferramenta:** Claude (Anthropic), em conversa no chat. Nenhuma ferramenta escreve direto
 no editor: o código é implementado por mim, e nada é commitado sem ser testado e sem que eu
-entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS.md). *Não foi utilizado CLI*
+entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS.md). Nenhuma ferramenta de IA de linha de comando foi usada.
 
 | Onde | Como a IA foi usada | O que foi meu |
 |---|---|---|
@@ -93,8 +93,10 @@ entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS
 | Banco e infraestrutura | Propôs o schema com os índices, o seed, os Dockerfiles e o compose, e explicou cada escolha | A implementação, a correção dos erros que apareceram no boot e a conferência com o sistema rodando |
 | Base da API e login | Comparou as formas de guardar o token, propôs o formato de erro, a validação e o login, e montou os testes de cada caminho de erro | A escolha do cookie, a implementação, a revisão dos comentários e a conferência fora do Docker e com o sistema rodando |
 | Protótipo das telas | Analisou o protótipo contra a especificação e as decisões, e aplicou as mudanças decididas na revisão | A primeira versão, as regras de cada tela (como a de o solicitante não ver o estoque) e a conferência nos dois perfis |
-
-Cada etapa acrescenta a sua linha nesta tabela.
+| Equipamentos e dashboard | Propôs as rotas, a validação da query e do id e os totais por status, e testou cada caminho de erro num ambiente separado antes de mandar o código | A regra de o solicitante não ver o estoque, a partir do fluxo real de gestão de ativos; o escopo só no obrigatório; a implementação e a conferência |
+| Solicitações | Propôs as rotas, a transação com atualização condicional e os códigos `409` e `422`, e montou os testes de cada caminho de erro | As regras de quem cria o pedido, do cancelamento e da justificativa na recusa; a implementação e a conferência com os dados do seed |
+| Frontend: login, equipamentos e painel | Propôs os componentes e o tratamento de carregamento, erro e validação, e testou cada passo com testes automáticos descartáveis, fora do repositório | O Tipo como lista, o modo escuro para depois da entrega, a implementação e o teste manual, que achou o defeito do Enter |
+| Frontend: solicitações e aprovação | Propôs as telas e os diálogos, testou teclado, conflito (`409`) e tela de celular num navegador, e conferiu cada commit antes da promoção | O escopo da etapa, a implementação e os testes manuais, inclusive com dois aprovadores ao mesmo tempo |
 
 ## Stack
 
