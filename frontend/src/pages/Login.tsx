@@ -14,6 +14,9 @@ const USUARIOS_TESTE = [
   { email: 'inativo@example.com', rotulo: 'inativo (recusado)' },
 ]
 
+// Endereço público de demonstração, onde os dados são os mesmos para todos os visitantes.
+const ENDERECO_PUBLICO = 'helpdesk.joaomendes.dev.br'
+
 type Erros = {
   email?: string
   senha?: string
@@ -87,6 +90,12 @@ export function Login() {
 
       <section className="flex items-center justify-center px-6 py-10">
         <form noValidate onSubmit={enviar} className="flex w-full max-w-sm flex-col gap-4">
+          {window.location.hostname === ENDERECO_PUBLICO && (
+            <Alerta tipo="info" titulo="Ambiente de demonstração">
+              O que for feito aqui fica registrado e aparece para todos que acessarem, até os dados serem zerados.
+            </Alerta>
+          )}
+
           <div>
             <h1 className="text-2xl font-bold">Entrar</h1>
             <p className="mt-1 text-[13px] text-suave">Use o seu e-mail e a sua senha.</p>
