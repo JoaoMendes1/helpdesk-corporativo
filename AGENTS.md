@@ -22,8 +22,8 @@
 **HelpDesk Corporativo** é um teste técnico full-stack: um sistema de solicitação e
 aprovação de equipamentos, com dois perfis de acesso (solicitante e aprovador).
 
-- **Endereço:** ainda não está no ar. A entrega é avaliada localmente, com
-  `docker compose up`.
+- **Endereço:** `helpdesk.joaomendes.dev.br`. A entrega continua sendo avaliada localmente,
+  com `docker compose up`.
 - **Stack:** Node.js com Express 5 (JavaScript) e Prisma 6 · MySQL · React 19 com Vite,
   TypeScript e Tailwind · Caddy servindo o frontend e repassando `/api` para o backend ·
   Docker Compose.

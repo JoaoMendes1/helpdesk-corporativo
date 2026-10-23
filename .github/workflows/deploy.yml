@@ -1,12 +1,9 @@
 name: Deploy
 
-# Desligado de propósito: o projeto ainda não roda no servidor. Liga depois da entrega
-# (etapa 9 do docs/ROADMAP.md), com a pasta clonada na VPS, os dois serviços no compose do
-# infra e os três secrets cadastrados no repositório (VPS_HOST, VPS_USER e VPS_SSH_KEY).
-# Aí as três linhas do push saem do comentário.
+# Publica a cada push na main. O MySQL do servidor não é recriado, e os dados do banco ficam.
 on:
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 # O deploy entra no servidor por SSH e não usa o token do GitHub.

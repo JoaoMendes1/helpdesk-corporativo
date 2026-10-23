@@ -7,6 +7,9 @@ equipamentos e decide cada pedido, com justificativa.
 **Estado:** ✅ pronto para avaliação: todos os requisitos da especificação estão implementados. O
 histórico por etapa está no [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
+**No ar:** [helpdesk.joaomendes.dev.br](https://helpdesk.joaomendes.dev.br), com os usuários de
+teste de [Como rodar](#como-rodar) e dados fictícios, que podem ser zerados a qualquer momento.
+
 ## Requisitos da especificação
 
 | Requisito | Status | Onde |
@@ -108,7 +111,7 @@ entenda o funcionamento. As regras que a IA segue estão no [`AGENTS.md`](AGENTS
 | **Autenticação** | JWT em cookie `httpOnly`, com a senha guardada como hash (`bcryptjs`) |
 | **Servidor web** | Caddy: serve o frontend e repassa `/api` para o backend |
 | **Local** | Docker Compose: banco, API e frontend sobem com `docker compose up` |
-| **Hospedagem** | VPS própria, em container Docker atrás do Caddy (planejado) |
+| **Hospedagem** | VPS própria, em container Docker atrás do Caddy |
 
 ## Documentação
 

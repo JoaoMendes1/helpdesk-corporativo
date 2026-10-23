@@ -201,7 +201,7 @@ O projeto roda de duas formas, com as mesmas duas imagens: a do `backend/Dockerf
 
 | | Local | Servidor |
 |---|---|---|
-| **Para quê** | Desenvolver e avaliar | Versão publicada (depois da entrega) |
+| **Para quê** | Desenvolver e avaliar | Versão publicada, em `helpdesk.joaomendes.dev.br` |
 | **Compose** | O `docker-compose.yml` deste repositório | O do repositório privado `infra` |
 | **Como sobe** | `docker compose up` | Pelo deploy, descrito abaixo |
 | **Containers** | `frontend`, `backend` e `mysql` | `frontend` e `backend` deste projeto, e um MySQL próprio no compose do `infra` |
@@ -213,6 +213,6 @@ lê o endereço do backend de uma variável, e a mesma imagem funciona nos dois.
 
 ### Deploy
 
-Desligado: o projeto ainda não roda no servidor. Quando for ligado, o push na `main` dispara
-o `.github/workflows/deploy.yml`, que atualiza o código no servidor, reconstrói as duas
-imagens e recria os dois containers.
+O push na `main` dispara o `.github/workflows/deploy.yml`, que atualiza o código no servidor,
+reconstrói as duas imagens e recria os containers do `frontend` e do `backend`. O MySQL não é
+recriado: os dados do banco continuam entre um deploy e outro, e o seed não roda de novo.

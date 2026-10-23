@@ -116,7 +116,7 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 ## Etapa 9: Depois da entrega (`optional`)
 
 - [ ] CI na `staging`
-- [ ] Deploy na VPS, com as duas imagens (backend e frontend)
+- [x] Deploy na VPS, com as duas imagens (backend e frontend) (#7)
 - [ ] Estudo de caso no portfólio
 - [ ] Modo escuro e menu recolhível, como no protótipo
 
@@ -137,6 +137,12 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   Docker e com o sistema rodando, e as telas, no navegador.
 
 ## Manutenção
+
+### 23/10/2026: deploy na VPS (#7)
+
+O sistema no ar em `helpdesk.joaomendes.dev.br`, com um MySQL próprio no servidor e o deploy a
+cada push na `main`. Conferido pelo navegador e com `curl`, inclusive o cookie do login com
+`Secure`, e sem nenhuma porta publicada.
 
 ### 23/10/2026: entrega
 
