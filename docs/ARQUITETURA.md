@@ -107,6 +107,10 @@ arquivos estáticos, que o Caddy serve.
 - **Filtros no endereço:** os filtros da lista de equipamentos ficam na query string
   (`?status=...&tipo=...`). O F5 os mantém, e os cartões do painel abrem a lista já filtrada.
 - **Texto do usuário** é exibido sempre como texto pelo React, nunca como HTML.
+- **Tema:** as cores vêm das variáveis do `@theme`, no `index.css`, e o tema escuro redefine essas
+  variáveis quando o `<html>` tem `data-tema="escuro"`. O tema claro é o padrão; o escolhido no
+  botão do cabeçalho fica salvo no navegador, e o `lib/tema.ts` o aplica antes da primeira
+  renderização.
 - **Desenvolvimento:** com o `docker compose up` rodando, `npm run dev` na pasta `frontend` sobe
   o Vite em `localhost:5173`, que repassa `/api` ao Caddy na porta 8080. A porta 8080 mostra o
   build copiado para a imagem, e só pega o código novo com `docker compose up --build`.

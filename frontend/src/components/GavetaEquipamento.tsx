@@ -68,7 +68,7 @@ export function GavetaEquipamento({ id, aoFechar }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-texto/45" onClick={aoFechar} aria-hidden="true" />
+      <div className="fixed inset-0 z-40 bg-veu/45" onClick={aoFechar} aria-hidden="true" />
       <aside role="dialog" aria-modal="true" aria-labelledby="gaveta-titulo" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-120 flex-col bg-superficie shadow-2xl">
         <div className="flex items-start gap-3 border-b-2 border-marca px-5 py-4.5">
           <div>

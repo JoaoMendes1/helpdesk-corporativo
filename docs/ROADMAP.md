@@ -14,7 +14,7 @@ As etapas do teste técnico, o que já está pronto e o que vem depois.
 | 6 · Frontend: login, equipamentos e dashboard | ✅ Concluída |
 | 7 · Frontend: solicitações e aprovação | ✅ Concluída |
 | 8 · Entrega | ✅ Concluída |
-| 9 · Depois da entrega (`optional`) | 🚧 Próxima |
+| 9 · Depois da entrega (`optional`) | ✅ Concluída |
 
 Legenda: ✅ Concluída · 🚧 Em andamento ou próxima · 🕐 Planejada.
 
@@ -118,7 +118,7 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 - [x] CI na `staging` (#8)
 - [x] Deploy na VPS, com as duas imagens (backend e frontend) (#7)
 - [x] Estudo de caso no portfólio
-- [ ] Modo escuro e menu recolhível, como no protótipo
+- [x] Modo escuro e menu recolhível, como no protótipo (#9)
 
 ## Dívida técnica conhecida
 
@@ -137,6 +137,12 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   Docker e com o sistema rodando, e as telas, no navegador.
 
 ## Manutenção
+
+### 26/10/2026: modo escuro e menu recolhível (#9)
+
+O tema escuro do protótipo, escolhido por um botão no cabeçalho e salvo no navegador, e o menu
+lateral recolhível em tela larga. Conferidos no navegador nas sete telas, nos dois temas e em
+tela de celular.
 
 ### 26/10/2026: CI na `staging` (#8)
 

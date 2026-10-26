@@ -29,7 +29,7 @@ export function Dialogo({ titulo, aoFechar, bloqueado = false, rodape, children 
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-texto/45" onClick={fechar} aria-hidden="true" />
+      <div className="fixed inset-0 z-40 bg-veu/45" onClick={fechar} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"

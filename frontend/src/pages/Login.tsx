@@ -73,7 +73,7 @@ export function Login() {
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
-      <section className="hidden flex-col justify-between bg-linear-160 from-azul to-[#12315f] p-12 text-white md:flex">
+      <section className="hidden flex-col justify-between bg-linear-160 from-marca-fundo to-[#12315f] p-12 text-white md:flex">
         <div>
           <p className="mb-2.5 text-xs font-extrabold uppercase tracking-wider text-[#a9e08f]">Solicitação e aprovação de equipamentos</p>
           <h2 className="text-4xl font-extrabold tracking-tight">HelpDesk Corporativo</h2>

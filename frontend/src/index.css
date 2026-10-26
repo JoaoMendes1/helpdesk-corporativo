@@ -17,6 +17,9 @@
   --color-marca-claro: #eef5df;
   --color-destaque: #59c935;
   --color-azul: #1d4f9c;
+  --color-marca-fundo: #1d4f9c;
+  --color-recolher: #2c6e8f;
+  --color-veu: #1e2939;
   --color-botao: #587a11;
   --color-botao-hover: #4f6d10;
   --color-perigo: #b42318;
@@ -34,8 +37,39 @@
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
+/* Tema escuro do protótipo: as mesmas variáveis, com outros valores. As ausentes não mudam. */
+:root[data-tema='escuro'] {
+  color-scheme: dark;
+  --color-fundo: #13171d;
+  --color-superficie: #1a1f27;
+  --color-superficie-2: #222833;
+  --color-texto: #e6e9ee;
+  --color-texto-2: #c3c9d3;
+  --color-suave: #9aa3b2;
+  --color-linha: #2b323d;
+  --color-linha-forte: #3b4451;
+  --color-menu: #161a21;
+  --color-hover: #252c37;
+  --color-marca: #8db82a;
+  --color-marca-texto: #a9d24a;
+  --color-marca-claro: #26311a;
+  --color-azul: #7aa8ee;
+  --color-botao-hover: #6a8f16;
+  --color-ok-fundo: #1c3218;
+  --color-ok-texto: #7fdc5e;
+  --color-info-fundo: #1b2c36;
+  --color-info-texto: #6fb3d6;
+  --color-aviso-fundo: #33270f;
+  --color-aviso-texto: #e0b050;
+  --color-erro-fundo: #3a1a17;
+  --color-erro-texto: #f07070;
+  --color-neutro-fundo: #2b323d;
+  --color-neutro-texto: #c3c9d3;
+  --color-veu: #000000;
+}
+
 @layer base {
-  /* Controles nativos do navegador (sugestões, listas de opções) no tema claro, como o resto da tela. */
+  /* Controles nativos do navegador (sugestões, listas de opções) no tema claro; o tema escuro troca acima. */
   :root {
     color-scheme: light;
   }

@@ -23,8 +23,8 @@ Status possíveis: ✅ Implementada · 🎨 Prototipada · 🕐 Planejada.
 
 ## Diferenças em relação ao protótipo
 
-- **Modo escuro e menu recolhível:** ficam para depois da entrega (etapa 9 do
-  [`ROADMAP.md`](ROADMAP.md)). Em tela estreita, o menu mostra só os ícones.
+- **Modo escuro:** a troca de tema fica num botão do cabeçalho, ao lado do Sair, e não no menu
+  do usuário.
 - **Sair:** fica direto no cabeçalho, sem o menu do usuário, que só teria essa opção.
 - **Menu:** o item Pendentes não mostra o número de solicitações; o painel mostra a lista.
 - **Tipo no cadastro de equipamento:** é escolhido numa lista dos tipos existentes, com a
