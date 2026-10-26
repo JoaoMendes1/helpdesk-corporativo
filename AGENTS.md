@@ -93,9 +93,6 @@ Valem só aqui. Cada uma tem o motivo, para não ser quebrada sem saber o custo.
   A especificação pede o arquivo com esse nome. Ter os dois quebraria o "um fato, um lugar".
 - **Nenhuma referência à empresa, ao cliente ou a sistema interno de quem avalia o teste**,
   em código, documentação, commit ou issue. O repositório é público.
-- **Enquanto o CI estiver desligado, a promoção para a `main` depende de conferência local:**
-  `docker compose up` sobe e o que mudou funciona. O CI entra depois do obrigatório pronto,
-  e esta regra sai junto.
 
 ## Lições de outros projetos que valem aqui
 

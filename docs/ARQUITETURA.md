@@ -211,6 +211,15 @@ O projeto roda de duas formas, com as mesmas duas imagens: a do `backend/Dockerf
 O nome do serviço do backend muda de um lado para o outro. Por isso o Caddyfile do frontend
 lê o endereço do backend de uma variável, e a mesma imagem funciona nos dois.
 
+### CI
+
+Cada push na `staging` dispara o `.github/workflows/ci.yml`, com dois jobs:
+
+| Job | O que confere |
+|---|---|
+| `frontend` | `npm ci`, o lint, em que aviso também reprova, e o build |
+| `sistema` | `docker compose up` do zero e sem `.env`, como quem avalia. Espera os testes de saúde e faz login pela porta do frontend, o que só funciona com as migrations aplicadas e o seed rodado |
+
 ### Deploy
 
 O push na `main` dispara o `.github/workflows/deploy.yml`, que atualiza o código no servidor,

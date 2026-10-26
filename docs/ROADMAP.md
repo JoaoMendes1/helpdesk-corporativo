@@ -2,7 +2,7 @@
 
 As etapas do teste técnico, o que já está pronto e o que vem depois.
 
-## Status (23/10/2026)
+## Status (26/10/2026)
 
 | Etapa | Status |
 |---|---|
@@ -115,9 +115,9 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
 
 ## Etapa 9: Depois da entrega (`optional`)
 
-- [ ] CI na `staging`
+- [x] CI na `staging` (#8)
 - [x] Deploy na VPS, com as duas imagens (backend e frontend) (#7)
-- [ ] Estudo de caso no portfólio
+- [x] Estudo de caso no portfólio
 - [ ] Modo escuro e menu recolhível, como no protótipo
 
 ## Dívida técnica conhecida
@@ -137,6 +137,12 @@ porque sustenta a regra crítica. O motivo está no [`DECISOES.md`](../DECISOES.
   Docker e com o sistema rodando, e as telas, no navegador.
 
 ## Manutenção
+
+### 26/10/2026: CI na `staging` (#8)
+
+Cada push na `staging` confere o lint e o build do frontend e sobe o projeto do zero com
+`docker compose up`, como quem avalia, até o login. Conferido com os mesmos comandos na máquina
+local, inclusive com o backend sem subir.
 
 ### 23/10/2026: deploy na VPS (#7)
 
